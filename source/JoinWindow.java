@@ -49,7 +49,7 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 	boolean pressFlag = false;
 	int windowX, windowY, blocksSize, pressPosition, enterPosition, type = -1;
 	BufferedImage showImage, blankImage;
-	public joinPanel panel;
+	public JoinPanel panel;
 	List<BufferedImage> ssBuffer;
 	List<Boolean> ssBufferFlag;
 	/* コンストラクタ */
@@ -186,7 +186,7 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 		getContentPane().setPreferredSize(new Dimension(windowX, windowY));
 		setLocationRelativeTo(null);
 		// オブジェクトにおける設定
-		panel = new joinPanel();
+		panel = new JoinPanel();
 		getContentPane().add(panel, BorderLayout.CENTER);
 		pack();
 		panel.repaint();
@@ -333,7 +333,7 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 		return clone;
 	}
 	/* 別クラス */
-	class joinPanel extends JPanel{
+	class JoinPanel extends JPanel{
 		@Override
 		public void paintComponent(Graphics graphics){
 			// 背景の絵を描写する
