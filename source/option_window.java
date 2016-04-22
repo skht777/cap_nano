@@ -1,4 +1,4 @@
-/* ƒIƒvƒVƒ‡ƒ“ƒEƒBƒ“ƒhƒE */
+/* ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ */
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -12,65 +12,65 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class option_window extends JFrame implements ActionListener{
-	/* ƒƒ“ƒo•Ï” */
-	// ’è”
+	/* ãƒ¡ãƒ³ãƒå¤‰æ•° */
+	// å®šæ•°
 	static final int object_x = 80;
 	static final int object_y = 24;
 	static final int object_space = 10;
 	static final int[] fps_int = {0, 1, 2, 3, 5, 10};
-	static final String[] fps_str = {"–³Œø", "1fps", "2fps", "3fps", "5fps", "10fps"};
-	// •Ï”
+	static final String[] fps_str = {"ç„¡åŠ¹", "1fps", "2fps", "3fps", "5fps", "10fps"};
+	// å¤‰æ•°
 	public static int fps;
 	public static JCheckBox checkbox1, checkbox2, checkbox3;
 	static JComboBox combo_box;
-	/* ƒRƒ“ƒXƒgƒ‰ƒNƒ^ */
+	/* ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ */
 	option_window(){
-		// ƒEƒBƒ“ƒhƒE‚Ìİ’è
-		setTitle("ƒIƒvƒVƒ‡ƒ“");
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®è¨­å®š
+		setTitle("ã‚ªãƒ—ã‚·ãƒ§ãƒ³");
 		getContentPane().setPreferredSize(new Dimension(position_x(3), position_y(2)));
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setResizable(false);
 		setAlwaysOnTop(true);
-		// ƒIƒuƒWƒFƒNƒg‚Ìİ’è
+		// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®è¨­å®š
 		JPanel panel = new JPanel();
 		panel.setLayout(null);
-		checkbox1 = new JCheckBox("Œrü•\¦");
+		checkbox1 = new JCheckBox("ç½«ç·šè¡¨ç¤º");
 			checkbox1.setBounds(position_x(0), position_y(0), size_x(1), size_y(1));
 			checkbox1.setMargin(new Insets(0, 0, 0, 0));
 			checkbox1.addActionListener(this);
-			checkbox1.setActionCommand("Œrü•\¦");
+			checkbox1.setActionCommand("ç½«ç·šè¡¨ç¤º");
 			checkbox1.setSelected(true);
 			panel.add(checkbox1);
-		checkbox2 = new JCheckBox("©“®æ“¾");
+		checkbox2 = new JCheckBox("è‡ªå‹•å–å¾—");
 			checkbox2.setBounds(position_x(1), position_y(0), size_x(1), size_y(1));
 			checkbox2.setMargin(new Insets(0, 0, 0, 0));
 			checkbox2.addActionListener(this);
-			checkbox2.setActionCommand("©“®æ“¾");
+			checkbox2.setActionCommand("è‡ªå‹•å–å¾—");
 			panel.add(checkbox2);
-		checkbox3 = new JCheckBox("–¼‘O‰B‚µ");
+		checkbox3 = new JCheckBox("åå‰éš ã—");
 			checkbox3.setBounds(position_x(2), position_y(0), size_x(1), size_y(1));
 			checkbox3.setMargin(new Insets(0, 0, 0, 0));
 			checkbox3.addActionListener(this);
-			checkbox3.setActionCommand("–¼‘O‰B‚µ");
+			checkbox3.setActionCommand("åå‰éš ã—");
 			checkbox3.setSelected(true);
 			panel.add(checkbox3);
 		combo_box = new JComboBox(fps_str);
 			combo_box.setBounds(position_x(0), position_y(1), size_x(1), size_y(1));
 			combo_box.addActionListener(this);
-			combo_box.setActionCommand("fps•ÏX");
+			combo_box.setActionCommand("fpså¤‰æ›´");
 			panel.add(combo_box);
 		getContentPane().add(panel, BorderLayout.CENTER);
 		pack();
 	}
-	/* ƒCƒxƒ“ƒgˆ——p */
+	/* ã‚¤ãƒ™ãƒ³ãƒˆå‡¦ç†ç”¨ */
 	public void actionPerformed(ActionEvent event){
 		String command_str = event.getActionCommand();
 		if(command_str == null) return;
-		if(command_str.equals("Œrü•\¦")){
+		if(command_str.equals("ç½«ç·šè¡¨ç¤º")){
 			nano.sort_frame.panel.repaint();
 			nano.unit_frame.panel.repaint();
 		}
-		if(command_str.equals("©“®æ“¾")){
+		if(command_str.equals("è‡ªå‹•å–å¾—")){
 			if(checkbox2.isSelected()){
 				if(main_window.combo_box1.getSelectedIndex() != 0){
 					main_window.timer.restart();
@@ -82,25 +82,25 @@ public class option_window extends JFrame implements ActionListener{
 				}
 			}
 		}
-		if(command_str.equals("fps•ÏX")){
+		if(command_str.equals("fpså¤‰æ›´")){
 			fps = fps_int[combo_box.getSelectedIndex()];
 			if(fps != 0){
-				main_window.putLog("y˜AË‹@”\z");
-				main_window.putLog("fpsF" + fps + "fps");
+				main_window.putLog("ã€é€£å°„æ©Ÿèƒ½ã€‘");
+				main_window.putLog("fpsï¼š" + fps + "fps");
 				if(main_window.combo_box1.getSelectedIndex() == 0){
 					main_window.timer.restart();
 					main_window.timer.setDelay(1000 / fps);
 				}
 			}else{
-				main_window.putLog("y˜AË‹@”\z");
-				main_window.putLog("fpsFOFF");
+				main_window.putLog("ã€é€£å°„æ©Ÿèƒ½ã€‘");
+				main_window.putLog("fpsï¼šOFF");
 				if(main_window.combo_box1.getSelectedIndex() == 0){
 					main_window.timer.setDelay(1000 * 60 * 60 * 24);
 				}
 			}
 		}
 	}
-	/* ƒIƒuƒWƒFƒNƒg—p’è”‚ğŒvZ‚·‚é */
+	/* ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç”¨å®šæ•°ã‚’è¨ˆç®—ã™ã‚‹ */
 	private static int position_x(int x){
 		return object_space * (x + 1) + object_x * x;
 	}

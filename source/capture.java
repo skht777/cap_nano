@@ -1,4 +1,4 @@
-/* ‰æ‘œæ“¾—p */
+/* ç”»åƒå–å¾—ç”¨ */
 
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -8,33 +8,33 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class capture{
-	/* ƒƒ“ƒo•Ï” */
-	// ’è”
+	/* ãƒ¡ãƒ³ãƒå¤‰æ•° */
+	// å®šæ•°
 	public static final int flash_x = 800;
 	public static final int flash_y = 480;
 	static final int judge_x = flash_x + 2;
 	static final int judge_y = flash_y + 2;
 	static final int white = 0xffffff;
-	// •Ï”
+	// å¤‰æ•°
 	static ArrayList<Integer> gd_index, gc_index;
 	static int display_index = -1, flash_px, flash_py;
-	/* ŠÍ‚±‚ê‚ÌÀ•W‚ğæ“¾‚·‚é */
+	/* è‰¦ã“ã‚Œã®åº§æ¨™ã‚’å–å¾—ã™ã‚‹ */
 	static public void getKancollePosition(){
 		display_index = -1;
-		main_window.putLog("yÀ•Wæ“¾z");
-		// À•W‚ğæ“¾‚·‚éˆ—
-		// ‚Ü‚¸A‘S‚Ä‚ÌƒfƒBƒXƒvƒŒƒC‚É‚¨‚¯‚éƒXƒNƒVƒ‡‚ğæ“¾‚·‚é
+		main_window.putLog("ã€åº§æ¨™å–å¾—ã€‘");
+		// åº§æ¨™ã‚’å–å¾—ã™ã‚‹å‡¦ç†
+		// ã¾ãšã€å…¨ã¦ã®ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã«ãŠã‘ã‚‹ã‚¹ã‚¯ã‚·ãƒ§ã‚’å–å¾—ã™ã‚‹
 		ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
 		gd_index = new ArrayList<Integer>();
 		gc_index = new ArrayList<Integer>();
 		try{
-			// ‘S‚Ä‚ÌƒOƒ‰ƒtƒBƒbƒNƒXƒfƒoƒCƒX‚ÉŠÖ‚·‚éî•ñ‚ğæ“¾‚·‚é
+			// å…¨ã¦ã®ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ãƒ‡ãƒã‚¤ã‚¹ã«é–¢ã™ã‚‹æƒ…å ±ã‚’å–å¾—ã™ã‚‹
 			GraphicsDevice[] all_gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
 			int i = 0, j;
 			for(GraphicsDevice gd : all_gd){
-				// ŠeƒOƒ‰ƒtƒBƒbƒNƒfƒoƒCƒX‚É‚¨‚¯‚éƒOƒ‰ƒtƒBƒbƒNƒX“Á«‚ğæ“¾‚·‚é
+				// å„ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ãƒ‡ãƒã‚¤ã‚¹ã«ãŠã‘ã‚‹ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ç‰¹æ€§ã‚’å–å¾—ã™ã‚‹
 				GraphicsConfiguration[] all_gc = gd.getConfigurations();
-				// ŠeƒOƒ‰ƒtƒBƒbƒNƒX“Á«‚É]‚¢A‚»‚ÌÀ•W‚ğæ“¾‚µ‚ÄƒXƒNƒVƒ‡‚ğB‚é
+				// å„ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ç‰¹æ€§ã«å¾“ã„ã€ãã®åº§æ¨™ã‚’å–å¾—ã—ã¦ã‚¹ã‚¯ã‚·ãƒ§ã‚’æ’®ã‚‹
 				Robot robot = new Robot(gd);
 				j = 0;
 				for(GraphicsConfiguration gc : all_gc){
@@ -45,42 +45,42 @@ public class capture{
 				}
 				i++;
 			}
-			// ŠeƒXƒNƒVƒ‡‚É‚¨‚¢‚ÄAŠÍ‚±‚ê‚Ì‰æ–Ê‚Æ‚È‚è‚¤‚é800x480‚Ì‰æ‘œ‚ğ’Tõ‚·‚é
+			// å„ã‚¹ã‚¯ã‚·ãƒ§ã«ãŠã„ã¦ã€è‰¦ã“ã‚Œã®ç”»é¢ã¨ãªã‚Šã†ã‚‹800x480ã®ç”»åƒã‚’æ¢ç´¢ã™ã‚‹
 			int n = 0;
 			for(BufferedImage image : images){
 				int width  = image.getWidth();
 				int height = image.getHeight();
-				// ŠÍ‚±‚ê‚Ì‰æ–Ê‚ª‘¶İ‚µ‚¦‚È‚¢‚Ù‚Ç‚ÌƒXƒNƒVƒ‡ƒTƒCƒY‚È‚ç’Tõ‚µ‚È‚¢
+				// è‰¦ã“ã‚Œã®ç”»é¢ãŒå­˜åœ¨ã—ãˆãªã„ã»ã©ã®ã‚¹ã‚¯ã‚·ãƒ§ã‚µã‚¤ã‚ºãªã‚‰æ¢ç´¢ã—ãªã„
 				if((width < judge_x) || (height < judge_y)) continue;
-				// ŠÍ‚±‚ê‚Ì‰æ–Ê‚ğŒŸõ‚·‚é
+				// è‰¦ã“ã‚Œã®ç”»é¢ã‚’æ¤œç´¢ã™ã‚‹
 				int search_x = width  - judge_x;
 				int search_y = height - judge_y;
 				for(int x = 0; x <= search_x; x++){
 					for(int y = 0; y <= search_y; y++){
-						// u¶ãv
+						// ã€Œå·¦ä¸Šã€
 						//[0xFFFFFF]0xFFFFFF
 						// 0xFFFFFF 0x??????
-						// ª‚Ü‚¸QÆ‚·‚é‚Ì‚Í[]‚ÌˆÊ’uBã‹Lƒpƒ^[ƒ“‚ğŒ©‚Â‚¯‚Ä‚©‚ç‘¼‚Ì3Šp‚ğŒ©‚Â‚¯‚é
+						// â†‘ã¾ãšå‚ç…§ã™ã‚‹ã®ã¯[]ã®ä½ç½®ã€‚ä¸Šè¨˜ãƒ‘ã‚¿ãƒ¼ãƒ³ã‚’è¦‹ã¤ã‘ã¦ã‹ã‚‰ä»–ã®3è§’ã‚’è¦‹ã¤ã‘ã‚‹
 						if((image.getRGB(x    , y    ) & white) != white) continue;
 						if((image.getRGB(x + 1, y    ) & white) != white) continue;
 						if((image.getRGB(x    , y + 1) & white) != white) continue;
 						if((image.getRGB(x + 1, y + 1) & white) == white) continue;
-						// u‰Eãv
+						// ã€Œå³ä¸Šã€
 						if((image.getRGB(x + flash_x    , y    ) & white) != white) continue;
 						if((image.getRGB(x + flash_x + 1, y    ) & white) != white) continue;
 						if((image.getRGB(x + flash_x    , y + 1) & white) == white) continue;
 						if((image.getRGB(x + flash_x + 1, y + 1) & white) != white) continue;
-						// u¶‰ºv
+						// ã€Œå·¦ä¸‹ã€
 						if((image.getRGB(x    , y + flash_y    ) & white) != white) continue;
 						if((image.getRGB(x + 1, y + flash_y    ) & white) == white) continue;
 						if((image.getRGB(x    , y + flash_y + 1) & white) != white) continue;
 						if((image.getRGB(x + 1, y + flash_y + 1) & white) != white) continue;
-						// u‰E‰ºv
+						// ã€Œå³ä¸‹ã€
 						if((image.getRGB(x + flash_x    , y + flash_y    ) & white) == white) continue;
 						if((image.getRGB(x + flash_x + 1, y + flash_y    ) & white) != white) continue;
 						if((image.getRGB(x + flash_x    , y + flash_y + 1) & white) != white) continue;
 						if((image.getRGB(x + flash_x + 1, y + flash_y + 1) & white) != white) continue;
-						// ŒŸo‚Å‚«‚½‚Ì‚ÅA‚»‚ÌƒfƒBƒXƒvƒŒƒC‚Ì”Ô†‚¨‚æ‚ÑÀ•W‚ğæ“¾‚·‚é
+						// æ¤œå‡ºã§ããŸã®ã§ã€ãã®ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®ç•ªå·ãŠã‚ˆã³åº§æ¨™ã‚’å–å¾—ã™ã‚‹
 						display_index = n;
 						flash_px = x + 1;
 						flash_py = y + 1;
@@ -91,16 +91,16 @@ public class capture{
 				n++;
 			}
 			if(display_index >= 0){
-				main_window.putLog("ƒfƒBƒXƒvƒŒƒC”Ô†-¶ãÀ•WF" + display_index + "-" + flash_px + "," + flash_py);
+				main_window.putLog("ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ç•ªå·-å·¦ä¸Šåº§æ¨™ï¼š" + display_index + "-" + flash_px + "," + flash_py);
 			}else{
-				main_window.putLog("ŠÍ‚±‚ê‚Ì‰æ–Ê‚ğæ“¾‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½B");
+				main_window.putLog("è‰¦ã“ã‚Œã®ç”»é¢ã‚’å–å¾—ã§ãã¾ã›ã‚“ã§ã—ãŸã€‚");
 			}
 		}
 		catch(Exception error){
 			error.printStackTrace();
 		}
 	}
-	/* ŠÍ‚±‚ê‚Ì‰æ–Ê‚ğæ“¾‚·‚é */
+	/* è‰¦ã“ã‚Œã®ç”»é¢ã‚’å–å¾—ã™ã‚‹ */
 	static public BufferedImage getImage(){
 		try{
 			if(display_index < 0) return null;

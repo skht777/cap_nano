@@ -1,6 +1,6 @@
-/* ˆê——ƒEƒBƒ“ƒhƒE(’ŠÛƒNƒ‰ƒX) */
+/* ä¸€è¦§ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦(æŠ½è±¡ã‚¯ãƒ©ã‚¹) */
 
-/* getIndex()‚É‚¨‚¢‚ÄAƒfƒtƒHƒ‹ƒg‚Ì”Ô†•t‚¯‚ÍŸ‚Ì’Ê‚èB
+/* getIndex()ã«ãŠã„ã¦ã€ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ç•ªå·ä»˜ã‘ã¯æ¬¡ã®é€šã‚Šã€‚
  * 00 01 02 03 04 05
  * 06 07 08 09 10 11
  * 12 13 14 15 16 17
@@ -40,20 +40,20 @@ import javax.swing.JPanel;
 import javax.swing.TransferHandler;
 
 abstract class join_window extends JFrame implements MouseListener, KeyListener, MouseMotionListener{
-	/* ƒƒ“ƒo•Ï” */
-	// ’è”
+	/* ãƒ¡ãƒ³ãƒå¤‰æ•° */
+	// å®šæ•°
 	static final float frame_width = 4.0f;
 	static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss-SSS");
-	// •Ï”
+	// å¤‰æ•°
 	boolean press_flg = false;
 	int window_x, window_y, blocks_size, press_position, enter_position, type_ = -1;
 	BufferedImage show_image, blank_image;
 	public join_panel panel;
 	ArrayList<BufferedImage> ss_buffer;
 	ArrayList<Boolean> ss_buffer_flg;
-	/* ƒRƒ“ƒXƒgƒ‰ƒNƒ^ */
+	/* ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ */
 	join_window(){
-		// ƒEƒBƒ“ƒhƒEEƒIƒuƒWƒFƒNƒg‚Ìİ’è
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ»ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®è¨­å®š
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setResizable(false);
 		setAlwaysOnTop(true);
@@ -64,7 +64,7 @@ abstract class join_window extends JFrame implements MouseListener, KeyListener,
 		window_y = get_sy_(get_blocks_y());
 		redraw();
 		setTransferHandler(new DropFileHandler());
-		// ƒoƒbƒtƒ@‚Ìİ’è
+		// ãƒãƒƒãƒ•ã‚¡ã®è¨­å®š
 		blocks_size = get_blocks_x() * get_blocks_y();
 		ss_buffer = new ArrayList<BufferedImage>();
 		ss_buffer_flg = new ArrayList<Boolean>();
@@ -82,7 +82,7 @@ abstract class join_window extends JFrame implements MouseListener, KeyListener,
 		graphics.fillRect(0, 0, window_x, window_y);
 		graphics.dispose();
 	}
-	/* ƒAƒNƒZƒbƒT */
+	/* ã‚¢ã‚¯ã‚»ãƒƒã‚µ */
 	abstract int get_position_x();
 	abstract int get_position_y();
 	abstract int get_block_size_x();
@@ -99,45 +99,45 @@ abstract class join_window extends JFrame implements MouseListener, KeyListener,
 	abstract int get_sy_(int y);
 	abstract String getWindowTitle();
 	abstract int getIndex(int i);
-	/* ƒ}ƒEƒXƒCƒxƒ“ƒg */
+	/* ãƒã‚¦ã‚¹ã‚¤ãƒ™ãƒ³ãƒˆ */
 	public void mouseClicked(MouseEvent event){
-		// ƒ_ƒuƒ‹ƒNƒŠƒbƒN‚µ‚½Û‚ÍA‚»‚ÌêŠ‚Ì‹L˜^‰æ‘œ‚ğÁ‹‚·‚é
+		// ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã—ãŸéš›ã¯ã€ãã®å ´æ‰€ã®è¨˜éŒ²ç”»åƒã‚’æ¶ˆå»ã™ã‚‹
 		if (event.getClickCount() < 2) return;
 		int delete_position = getPosition(event);
 		if(ss_buffer_flg.get(delete_position) == false) return;
-		main_window.putLog("y‰æ‘œíœz");
-			// show_image(‰æ–Ê•\¦)ã‚Å‚Ìíœ
+		main_window.putLog("ã€ç”»åƒå‰Šé™¤ã€‘");
+			// show_image(ç”»é¢è¡¨ç¤º)ä¸Šã§ã®å‰Šé™¤
 			int x = delete_position % get_blocks_x(), y = delete_position / get_blocks_x();
 			Graphics graphics = show_image.getGraphics();
 			graphics.setColor(Color.white);
 			graphics.fillRect(get_sx_(x), get_sy_(y), get_block_size_x_(), get_block_size_y_());
 			graphics.dispose();
-			// ƒoƒbƒtƒ@‚Ìíœ
+			// ãƒãƒƒãƒ•ã‚¡ã®å‰Šé™¤
 			ss_buffer.set(delete_position, clone(blank_image));
-			// ƒtƒ‰ƒO‚Ìíœ
+			// ãƒ•ãƒ©ã‚°ã®å‰Šé™¤
 			ss_buffer_flg.set(delete_position, false);
-		main_window.putLog("’Ç‰ÁˆÊ’uF(" + x+  "," + y + ")");
+		main_window.putLog("è¿½åŠ ä½ç½®ï¼š(" + x+  "," + y + ")");
 		panel.repaint();
 	}
 	public void mousePressed(MouseEvent event){
 		if(!press_flg){
-			// ƒ}ƒEƒX‚ğ‰Ÿ‚µ‚½Û‚ÍA‰Ÿ‚µ‚½ˆÊ’u‚ğ‹L‰¯‚µ‚Ä‚¨‚­
+			// ãƒã‚¦ã‚¹ã‚’æŠ¼ã—ãŸéš›ã¯ã€æŠ¼ã—ãŸä½ç½®ã‚’è¨˜æ†¶ã—ã¦ãŠã
 			press_position = getPosition(event);
 			press_flg = true;
 			panel.repaint();
 		}else{
-			// ƒ}ƒEƒX‚Åƒhƒ‰ƒbƒO‚µ‚Ä‚¢‚éŠÔ‚ÍA‘ÎÛ‚ÌˆÊ’u‚à‹L‰¯‚µ‚Äˆ—‚·‚é
+			// ãƒã‚¦ã‚¹ã§ãƒ‰ãƒ©ãƒƒã‚°ã—ã¦ã„ã‚‹é–“ã¯ã€å¯¾è±¡ã®ä½ç½®ã‚‚è¨˜æ†¶ã—ã¦å‡¦ç†ã™ã‚‹
 			enter_position = getPosition(event);
 			panel.repaint();
 		}
 	}
 	public void mouseReleased(MouseEvent event){
-		// ƒ}ƒEƒX‚ğ—£‚µ‚½Û‚ÍA‚»‚ÌˆÊ’u‚Ìƒ}ƒX‚Æ‚ÌŒğŠ·‚ğs‚¤
+		// ãƒã‚¦ã‚¹ã‚’é›¢ã—ãŸéš›ã¯ã€ãã®ä½ç½®ã®ãƒã‚¹ã¨ã®äº¤æ›ã‚’è¡Œã†
 		if(press_flg == false) return;
 		int release_position = getPosition(event);
 		if(press_position != release_position){
-			main_window.putLog("y‰æ‘œŒğŠ·z");
-				// show_image(‰æ–Ê•\¦)ã‚Å‚ÌŒğŠ·
+			main_window.putLog("ã€ç”»åƒäº¤æ›ã€‘");
+				// show_image(ç”»é¢è¡¨ç¤º)ä¸Šã§ã®äº¤æ›
 				int x1 =   press_position % get_blocks_x(), y1 =   press_position / get_blocks_x();
 				int x2 = release_position % get_blocks_x(), y2 = release_position / get_blocks_x();
 				BufferedImage temp_1 = clone(show_image.getSubimage(get_sx_(x1), get_sy_(y1), get_block_size_x_(), get_block_size_y_()));
@@ -146,15 +146,15 @@ abstract class join_window extends JFrame implements MouseListener, KeyListener,
 				graphics.drawImage(temp_1, get_sx_(x2), get_sy_(y2), this);
 				graphics.drawImage(temp_2, get_sx_(x1), get_sy_(y1), this);
 				graphics.dispose();
-				// ƒoƒbƒtƒ@‚ÌŒğŠ·
+				// ãƒãƒƒãƒ•ã‚¡ã®äº¤æ›
 				BufferedImage buffer2 = clone(ss_buffer.get(press_position));
 				ss_buffer.set(press_position, clone(ss_buffer.get(release_position)));
 				ss_buffer.set(release_position, buffer2);
-				// ƒtƒ‰ƒO‚ÌŒğŠ·
+				// ãƒ•ãƒ©ã‚°ã®äº¤æ›
 				boolean flg = ss_buffer_flg.get(press_position);
 				ss_buffer_flg.set(press_position, ss_buffer_flg.get(release_position));
 				ss_buffer_flg.set(release_position, flg);
-			main_window.putLog("(" + x2 + "," + y2 + ")Ì(" + x1 + "," + y1 + ")");
+			main_window.putLog("(" + x2 + "," + y2 + ")â‡”(" + x1 + "," + y1 + ")");
 		}
 		press_flg = false;
 		panel.repaint();
@@ -166,9 +166,9 @@ abstract class join_window extends JFrame implements MouseListener, KeyListener,
 		enter_position = getPosition(event);
 		panel.repaint();
 	}
-	/* ƒL[ƒCƒxƒ“ƒg */
+	/* ã‚­ãƒ¼ã‚¤ãƒ™ãƒ³ãƒˆ */
 	public void keyPressed(KeyEvent event){
-		// Alt+Z‚É”½‰‚·‚é
+		// Alt+Zã«åå¿œã™ã‚‹
 		int keycode = event.getKeyCode();
 		if (keycode != KeyEvent.VK_Z) return;
 		int modifer = event.getModifiersEx();
@@ -178,19 +178,19 @@ abstract class join_window extends JFrame implements MouseListener, KeyListener,
 	}
 	public void keyReleased(KeyEvent e){}
 	public void keyTyped(KeyEvent e){}
-	/* •\¦‚ğXV‚·‚é */
+	/* è¡¨ç¤ºã‚’æ›´æ–°ã™ã‚‹ */
 	void redraw(){
-		// ƒEƒBƒ“ƒhƒE‚É‚¨‚¯‚éİ’è
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã«ãŠã‘ã‚‹è¨­å®š
 		setTitle(getWindowTitle());
 		getContentPane().setPreferredSize(new Dimension(window_x, window_y));
 		setLocationRelativeTo(null);
-		// ƒIƒuƒWƒFƒNƒg‚É‚¨‚¯‚éİ’è
+		// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ãŠã‘ã‚‹è¨­å®š
 		panel = new join_panel();
 		getContentPane().add(panel, BorderLayout.CENTER);
 		pack();
 		panel.repaint();
 	}
-	/* ƒRƒ“ƒ{ƒ{ƒbƒNƒX‚Ìó‘Ô‚©‚çAƒEƒBƒ“ƒhƒE‚Ì•\¦‚ğ•ÏX‚·‚é */
+	/* ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹ã®çŠ¶æ…‹ã‹ã‚‰ã€ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®è¡¨ç¤ºã‚’å¤‰æ›´ã™ã‚‹ */
 	public void changeMode(int dir, int type){
 		set_dir(dir);
 		set_type(type);
@@ -210,14 +210,14 @@ abstract class join_window extends JFrame implements MouseListener, KeyListener,
 		}
 		redraw();
 	}
-	/* ‰æ‘œ‚ğ’Ç‰Á‚·‚é */
+	/* ç”»åƒã‚’è¿½åŠ ã™ã‚‹ */
 	public void addImage(BufferedImage image){
 		if(image == null) return;
 		if(checkImage(image) == false) return;
 		for(int i = 0; i < blocks_size; i++){
 			int p = getIndex(i);
 			if(ss_buffer_flg.get(p) == false){
-				main_window.putLog("y‰æ‘œ’Ç‰Áz");
+				main_window.putLog("ã€ç”»åƒè¿½åŠ ã€‘");
 					ss_buffer.set(p, image);
 					ss_buffer_flg.set(p, true);
 					int px = p % get_blocks_x(), py = p / get_blocks_x();
@@ -226,18 +226,18 @@ abstract class join_window extends JFrame implements MouseListener, KeyListener,
 					graphics.drawImage(temp.getScaledInstance(get_block_size_x_(), get_block_size_y_(), Image.SCALE_AREA_AVERAGING), get_sx_(px), get_sy_(py), this);
 					graphics.dispose();
 					panel.repaint();
-				main_window.putLog("ˆÊ’uF(" + px + "," + py + ")");
+				main_window.putLog("ä½ç½®ï¼š(" + px + "," + py + ")");
 				return;
 			}
 		}
 	}
-	/* ‰æ‘œ‚ğ’Ç‰Á‚·‚é(ˆÊ’u”F¯Ver) */
+	/* ç”»åƒã‚’è¿½åŠ ã™ã‚‹(ä½ç½®èªè­˜Ver) */
 	public void addImageX(BufferedImage image){
 		if(image == null) return;
 		int position = checkImageX(image);
 		if(position < 0) return;
 		position = getIndex(position);
-		main_window.putLog("y©“®æ“¾z");
+		main_window.putLog("ã€è‡ªå‹•å–å¾—ã€‘");
 			ss_buffer.set(position, image);
 			ss_buffer_flg.set(position, true);
 			int px = position % get_blocks_x(), py = position / get_blocks_x();
@@ -246,12 +246,12 @@ abstract class join_window extends JFrame implements MouseListener, KeyListener,
 			graphics.drawImage(temp.getScaledInstance(get_block_size_x_(), get_block_size_y_(), Image.SCALE_AREA_AVERAGING), get_sx_(px), get_sy_(py), this);
 			graphics.dispose();
 			panel.repaint();
-		main_window.putLog("ˆÊ’uF(" + px + "," + py + ")");
+		main_window.putLog("ä½ç½®ï¼š(" + px + "," + py + ")");
 	}
-	/* ‰æ‘œ‚ğ•Û‘¶‚·‚é */
+	/* ç”»åƒã‚’ä¿å­˜ã™ã‚‹ */
 	abstract void addSpecialFrame(BufferedImage image, int px1, int py1, int px2, int py2);
 	public void savePicture(){
-		// Å‘å—Ìˆæ‚ğ”»’f‚·‚é
+		// æœ€å¤§é ˜åŸŸã‚’åˆ¤æ–­ã™ã‚‹
 		int px1 = get_blocks_x(), py1 = get_blocks_y(), px2 = -1, py2 = -1;
 		for(int x = 0; x < get_blocks_x(); x++){
 			for(int y = 0; y < get_blocks_y(); y++){
@@ -264,8 +264,8 @@ abstract class join_window extends JFrame implements MouseListener, KeyListener,
 			}
 		}
 		if(px2 - px1 < 0) return;
-		// •Û‘¶—pƒoƒbƒtƒ@‚É‰æ‘œ‚ğ”z’u‚·‚é
-		main_window.putLog("y‰æ‘œ•Û‘¶z");
+		// ä¿å­˜ç”¨ãƒãƒƒãƒ•ã‚¡ã«ç”»åƒã‚’é…ç½®ã™ã‚‹
+		main_window.putLog("ã€ç”»åƒä¿å­˜ã€‘");
 		BufferedImage save_buffer = new BufferedImage(get_sx(get_blocks_x()), get_sy(get_blocks_y()), BufferedImage.TYPE_INT_BGR);
 		Graphics graphics = save_buffer.getGraphics();
 		for(int x = 0; x < get_blocks_x(); x++){
@@ -275,23 +275,23 @@ abstract class join_window extends JFrame implements MouseListener, KeyListener,
 			}
 		}
 		graphics.dispose();
-		// “Áê‚È˜gü‚ğ’Ç‰Á‚·‚é
+		// ç‰¹æ®Šãªæ ç·šã‚’è¿½åŠ ã™ã‚‹
 		if(option_window.checkbox1.isSelected()){
 			addSpecialFrame(save_buffer, px1, py1, px2, py2);
 		}
-		// ‰æ‘œ‚Ì•Û‘¶ˆ—
+		// ç”»åƒã®ä¿å­˜å‡¦ç†
 		String save_name = sdf.format(Calendar.getInstance().getTime()) + ".png";
 		try{
 			ImageIO.write(save_buffer.getSubimage(px1 * get_block_size_x(), py1 * get_block_size_y(), (px2 - px1 + 1) * get_block_size_x(), (py2 - py1 + 1) * get_block_size_y()), "png", new File(save_name));
 			main_window.putLog(save_name);
-			int option = JOptionPane.showConfirmDialog(this, "‰æ‘œ‚ğƒNƒŠƒA‚µ‚Ü‚·‚©H", "‹L˜^‚Í‘åØ‚È‚Ì", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+			int option = JOptionPane.showConfirmDialog(this, "ç”»åƒã‚’ã‚¯ãƒªã‚¢ã—ã¾ã™ã‹ï¼Ÿ", "è¨˜éŒ²ã¯å¤§åˆ‡ãªã®", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 			if(option == JOptionPane.YES_OPTION){
-				// show_image‚Ìíœ
+				// show_imageã®å‰Šé™¤
 				graphics = show_image.getGraphics();
 				graphics.setColor(Color.white);
 				graphics.fillRect(0, 0, window_x, window_y);
 				graphics.dispose();
-				// ƒoƒbƒtƒ@Eƒtƒ‰ƒO‚Ìíœ
+				// ãƒãƒƒãƒ•ã‚¡ãƒ»ãƒ•ãƒ©ã‚°ã®å‰Šé™¤
 				for(int i = 0; i < blocks_size; i++){
 					ss_buffer.set(i, clone(blank_image));
 					ss_buffer_flg.set(i, false);
@@ -303,7 +303,7 @@ abstract class join_window extends JFrame implements MouseListener, KeyListener,
 			error.printStackTrace();
 		}
 	}
-	/* ‰æ‘œ”»’è */
+	/* ç”»åƒåˆ¤å®š */
 	abstract boolean checkImage(BufferedImage image);
 	abstract int checkImageX(BufferedImage image);
 	public static boolean checkColor(BufferedImage image, int x, int y, int r, int g, int b){
@@ -313,7 +313,7 @@ abstract class join_window extends JFrame implements MouseListener, KeyListener,
 		if(diff < 500) return true;
 		return false;
 	}
-	/* À•Wæ“¾ */
+	/* åº§æ¨™å–å¾— */
 	int getPosition(MouseEvent event){
 		Point point = event.getPoint();
 		int mx = point.x / get_block_size_x_(), my = point.y / get_block_size_y_();
@@ -323,7 +323,7 @@ abstract class join_window extends JFrame implements MouseListener, KeyListener,
 		if(my >= get_blocks_y()) my = get_blocks_y() - 1;
 		return my * get_blocks_x() + mx;
 	}
-	/* ‰æ‘œ‚ğƒfƒB[ƒvƒRƒs[‚·‚é */
+	/* ç”»åƒã‚’ãƒ‡ã‚£ãƒ¼ãƒ—ã‚³ãƒ”ãƒ¼ã™ã‚‹ */
 	BufferedImage clone(BufferedImage image){
 		BufferedImage clone = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 		Graphics graphics = clone.createGraphics();
@@ -331,14 +331,14 @@ abstract class join_window extends JFrame implements MouseListener, KeyListener,
 		graphics.dispose();
 		return clone;
 	}
-	/* •ÊƒNƒ‰ƒX */
+	/* åˆ¥ã‚¯ãƒ©ã‚¹ */
 	class join_panel extends JPanel{
 		@Override
 		public void paintComponent(Graphics graphics){
-			// ”wŒi‚ÌŠG‚ğ•`Ê‚·‚é
+			// èƒŒæ™¯ã®çµµã‚’æå†™ã™ã‚‹
 			graphics.drawImage(show_image, 0, 0, this);
 			Graphics2D graphics2d = (Graphics2D)graphics;
-			// ƒ}[ƒJ[‚ğ•`Ê‚·‚é
+			// ãƒãƒ¼ã‚«ãƒ¼ã‚’æå†™ã™ã‚‹
 			if(press_flg){
 				BasicStroke wideStroke = new BasicStroke(frame_width);
 				graphics2d.setStroke(wideStroke);
@@ -352,7 +352,7 @@ abstract class join_window extends JFrame implements MouseListener, KeyListener,
 				graphics2d.setStroke(normalStroke);
 				graphics2d.setPaint(Color.BLACK);
 			}
-			// ˜gü‚ğ•`Ê‚·‚é
+			// æ ç·šã‚’æå†™ã™ã‚‹
 			for(int x = 1; x <= get_blocks_x() - 1; x++){
 				graphics2d.draw(new Line2D.Double(get_sx_(x), 0, get_sx_(x), window_y));
 			}
@@ -366,22 +366,22 @@ abstract class join_window extends JFrame implements MouseListener, KeyListener,
 	class DropFileHandler extends TransferHandler{
 		@Override
 		public boolean canImport(TransferSupport support){
-			// ƒhƒƒbƒv‚³‚ê‚Ä‚¢‚È‚¢ê‡‚Íó‚¯æ‚ç‚È‚¢
+			// ãƒ‰ãƒ­ãƒƒãƒ—ã•ã‚Œã¦ã„ãªã„å ´åˆã¯å—ã‘å–ã‚‰ãªã„
 			if(!support.isDrop()) return false;
-			// ƒhƒƒbƒv‚³‚ê‚½‚à‚Ì‚ªƒtƒ@ƒCƒ‹‚Å‚Í‚È‚¢ê‡‚Íó‚¯æ‚ç‚È‚¢
+			// ãƒ‰ãƒ­ãƒƒãƒ—ã•ã‚ŒãŸã‚‚ã®ãŒãƒ•ã‚¡ã‚¤ãƒ«ã§ã¯ãªã„å ´åˆã¯å—ã‘å–ã‚‰ãªã„
 			if(!support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) return false;
 			return true;
 		}
 		@Override
 		public boolean importData(TransferSupport support){
-			// ó‚¯æ‚Á‚Ä‚¢‚¢‚à‚Ì‚©Šm”F‚·‚é
+			// å—ã‘å–ã£ã¦ã„ã„ã‚‚ã®ã‹ç¢ºèªã™ã‚‹
 			if(!canImport(support)) return false;
-			// ƒhƒƒbƒvˆ—
+			// ãƒ‰ãƒ­ãƒƒãƒ—å‡¦ç†
 			Transferable transferable = support.getTransferable();
 			try{
-				// ƒtƒ@ƒCƒ‹‚ğó‚¯æ‚é
+				// ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å—ã‘å–ã‚‹
 				List<File> files = (List<File>)transferable.getTransferData(DataFlavor.javaFileListFlavor);
-				// ‡”Ô‚É“Ç‚İ‚ñ‚Å’Ç‰Á‚·‚é
+				// é †ç•ªã«èª­ã¿è¾¼ã‚“ã§è¿½åŠ ã™ã‚‹
 				for(File file : files){
 					BufferedImage load_image = ImageIO.read(file);
 					addImage(load_image);

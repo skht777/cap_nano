@@ -1,4 +1,4 @@
-/* ‰ü‘•ˆê——ƒEƒBƒ“ƒhƒE */
+/* æ”¹è£…ä¸€è¦§ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ */
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -9,8 +9,8 @@ import java.awt.image.BufferedImage;
 import java.awt.geom.Line2D;
 
 public class unit_window extends join_window{
-	/* ƒƒ“ƒo•Ï” */
-	// ’è”
+	/* ãƒ¡ãƒ³ãƒå¤‰æ•° */
+	// å®šæ•°
 	static final int[] position_x = {327, 327};
 	static final int[] position_y = {103, 103};
 	static final int[] block_size_x = {230, 460};
@@ -18,15 +18,15 @@ public class unit_window extends join_window{
 	static final int blocks_x = 6;
 	static final int blocks_y = 6;
 	static final int zooming = 4;
-	public static final String[] show_dir_str  = {"s‚ğ—Dæ", "—ñ‚ğ—Dæ", "ŠÍ‘à—Dæ"};
-	public static final String[] show_type_str = {"k¬•\¦", "’Êí•\¦"};
-	static final String title = "‰ü‘•ˆê——";
+	public static final String[] show_dir_str  = {"è¡Œã‚’å„ªå…ˆ", "åˆ—ã‚’å„ªå…ˆ", "è‰¦éšŠå„ªå…ˆ"};
+	public static final String[] show_type_str = {"ç¸®å°è¡¨ç¤º", "é€šå¸¸è¡¨ç¤º"};
+	static final String title = "æ”¹è£…ä¸€è¦§";
 	static final BasicStroke wideStroke = new BasicStroke(8.0f);
-	// •Ï”
-	static int show_dir  = 0;	//•\¦•ûŒü(s—DæE—ñ—Dæ)
-	static int show_type = 1;	//•\¦í—Ş(ƒRƒ“ƒpƒNƒgE’Êí)
+	// å¤‰æ•°
+	static int show_dir  = 0;	//è¡¨ç¤ºæ–¹å‘(è¡Œå„ªå…ˆãƒ»åˆ—å„ªå…ˆ)
+	static int show_type = 1;	//è¡¨ç¤ºç¨®é¡(ã‚³ãƒ³ãƒ‘ã‚¯ãƒˆãƒ»é€šå¸¸)
 	static int[] index = new int[blocks_x * blocks_y];
-	/* ƒRƒ“ƒXƒgƒ‰ƒNƒ^ */
+	/* ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ */
 	unit_window(){
 		super();
 		int count = 0;
@@ -42,7 +42,7 @@ public class unit_window extends join_window{
 			}
 		}
 	}
-	/* ƒAƒNƒZƒbƒT */
+	/* ã‚¢ã‚¯ã‚»ãƒƒã‚µ */
 	int get_position_x(){return position_x[show_type];}
 	int get_position_y(){return position_y[show_type];}
 	int get_block_size_x(){return block_size_x[show_type];}
@@ -60,23 +60,23 @@ public class unit_window extends join_window{
 	String getWindowTitle(){return title + " - " + show_dir_str[show_dir] + " - " + show_type_str[show_type];}
 	int getIndex(int i){
 		switch(show_dir){
-			case 0:	//s‚ğ—Dæ
+			case 0:	//è¡Œã‚’å„ªå…ˆ
 				return i;
-			case 1:	//—ñ‚ğ—Dæ
+			case 1:	//åˆ—ã‚’å„ªå…ˆ
 				int x = i / blocks_y, y = i % blocks_y;
 				return y * blocks_x + x;
-			case 2:	//ƒnƒCƒuƒŠƒbƒh
+			case 2:	//ãƒã‚¤ãƒ–ãƒªãƒƒãƒ‰
 				return index[i];
 		}
 		return 0;
 	}
-	/* ‰æ‘œˆ— */
+	/* ç”»åƒå‡¦ç† */
 	void addSpecialFrame(BufferedImage image, int px1, int py1, int px2, int py2){
 		Graphics2D graphics2d = (Graphics2D)image.getGraphics();
 		graphics2d.setStroke(wideStroke);
 		graphics2d.setPaint(Color.BLUE);
 		switch(show_dir){
-			case 0:	//s‚ğ—Dæ
+			case 0:	//è¡Œã‚’å„ªå…ˆ
 				for(int y = 1; y < blocks_y; y++){
 					for(int x = 0; x < blocks_x; x++){
 						if((y != py1) && (y != py2 + 1)){
@@ -85,7 +85,7 @@ public class unit_window extends join_window{
 					}
 				}
 				break;
-			case 1:	//—ñ‚ğ—Dæ
+			case 1:	//åˆ—ã‚’å„ªå…ˆ
 				for(int x = 1; x < blocks_x; x++){
 					for(int y = 0; y < blocks_y; y++){
 						if((x != px1) && (x != px2 + 1)){
@@ -94,7 +94,7 @@ public class unit_window extends join_window{
 					}
 				}
 				break;
-			case 2:	//ŠÍ‘à—Dæ
+			case 2:	//è‰¦éšŠå„ªå…ˆ
 				for(int x = 0; x < blocks_x; x++){
 					if((3 != py1) && (3 != py2 + 1)){
 						graphics2d.draw(new Line2D.Double(get_sx(x), get_sy(3), get_sx(x + 1), get_sy(3)));
@@ -128,7 +128,7 @@ public class unit_window extends join_window{
 		}
 		graphics2d.dispose();
 	}
-	/* ‰æ‘œ”»’è */
+	/* ç”»åƒåˆ¤å®š */
 	boolean checkImage(BufferedImage image){
 		return checkColor(image, 300, 172, 241, 191, 119);
 	}

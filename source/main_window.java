@@ -1,4 +1,4 @@
-/* ƒƒCƒ“ƒEƒBƒ“ƒhƒE */
+/* ãƒ¡ã‚¤ãƒ³ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ */
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -25,57 +25,57 @@ import javax.swing.Timer;
 import jdk.nashorn.internal.ir.BreakableNode;
 
 public class main_window extends JFrame implements ActionListener{
-	/* ƒƒ“ƒo•Ï” */
-	// ’è”
+	/* ãƒ¡ãƒ³ãƒå¤‰æ•° */
+	// å®šæ•°
 	static final int object_x = 80;
 	static final int object_y = 24;
 	static final int object_space = 10;
-	static final String soft_name = "‹L˜^‚Í‘åØ‚È‚Ì";
-	static final String[] mode_type_str = {"’Êí", "‰ü‘•", "ƒ\[ƒg"};
-	static final String[] save_type_str = {"’Êí", "•Ò¬", "‘Ş"};
+	static final String soft_name = "è¨˜éŒ²ã¯å¤§åˆ‡ãªã®";
+	static final String[] mode_type_str = {"é€šå¸¸", "æ”¹è£…", "ã‚½ãƒ¼ãƒˆ"};
+	static final String[] save_type_str = {"é€šå¸¸", "ç·¨æˆ", "è³‡æ"};
 	static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss-SSS");
-	// •Ï”
+	// å¤‰æ•°
 	static int save_type = 0;
 	public static JComboBox combo_box1;
 	static JComboBox combo_box2, join_combo_dir, join_combo_type;
 	static DefaultComboBoxModel model_save, model_dir, model_type;
 	public static JTextArea text_area;
 	public static Timer timer;
-	/* ƒRƒ“ƒXƒgƒ‰ƒNƒ^ */
+	/* ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ */
 	main_window(){
-		// ƒEƒBƒ“ƒhƒE‚Ìİ’è
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®è¨­å®š
 		setTitle(soft_name);
 		getContentPane().setPreferredSize(new Dimension(position_x(4), position_y(5)));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
 		setVisible(true);
 		setAlwaysOnTop(true);
-		// ƒIƒuƒWƒFƒNƒg‚Ìİ’è
+		// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®è¨­å®š
 		JPanel panel = new JPanel();
 		panel.setLayout(null);
-		JButton button1 = new JButton("À•Wæ“¾");
+		JButton button1 = new JButton("åº§æ¨™å–å¾—");
 			button1.setBounds(position_x(0), position_y(0), size_x(1), size_y(1));
 			button1.setMargin(new Insets(0, 0, 0, 0));
 			button1.addActionListener(this);
-			button1.setActionCommand("À•Wæ“¾");
+			button1.setActionCommand("åº§æ¨™å–å¾—");
 			panel.add(button1);
 		combo_box1 = new JComboBox(mode_type_str);
 			combo_box1.setBounds(position_x(1), position_y(0), size_x(1), size_y(1));
 			combo_box1.addActionListener(this);
-			combo_box1.setActionCommand("ƒ‚[ƒh•ÏX");
+			combo_box1.setActionCommand("ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´");
 			panel.add(combo_box1);
-		JButton button2 = new JButton("‰æ‘œ’Ç‰Á");
+		JButton button2 = new JButton("ç”»åƒè¿½åŠ ");
 			button2.setBounds(position_x(2), position_y(0), size_x(1), size_y(1));
 			button2.setMargin(new Insets(0, 0, 0, 0));
 			button2.addActionListener(this);
-			button2.setActionCommand("‰æ‘œ’Ç‰Á");
+			button2.setActionCommand("ç”»åƒè¿½åŠ ");
 			button2.setMnemonic(KeyEvent.VK_Z);
 			panel.add(button2);
-		JButton button3 = new JButton("‰æ‘œ•Û‘¶");
+		JButton button3 = new JButton("ç”»åƒä¿å­˜");
 			button3.setBounds(position_x(3), position_y(0), size_x(1), size_y(1));
 			button3.setMargin(new Insets(0, 0, 0, 0));
 			button3.addActionListener(this);
-			button3.setActionCommand("‰æ‘œ•Û‘¶");
+			button3.setActionCommand("ç”»åƒä¿å­˜");
 			panel.add(button3);
 		text_area = new JTextArea();
 			text_area.setEditable(false);
@@ -86,50 +86,50 @@ public class main_window extends JFrame implements ActionListener{
 			combo_box2 = new JComboBox(model_save);
 			combo_box2.setBounds(position_x(0), position_y(1), size_x(1), size_y(1));
 			combo_box2.addActionListener(this);
-			combo_box2.setActionCommand("•Û‘¶í•Ê");
+			combo_box2.setActionCommand("ä¿å­˜ç¨®åˆ¥");
 			panel.add(combo_box2);
 		model_dir = new DefaultComboBoxModel();
 			join_combo_dir = new JComboBox(model_dir);
 			join_combo_dir.setBounds(position_x(1), position_y(1), size_x(1), size_y(1));
 			join_combo_dir.addActionListener(this);
-			join_combo_dir.setActionCommand("•ûŒü•ÏX");
+			join_combo_dir.setActionCommand("æ–¹å‘å¤‰æ›´");
 			join_combo_dir.setEnabled(false);
 			panel.add(join_combo_dir);
 		model_type = new DefaultComboBoxModel();
 			join_combo_type = new JComboBox(model_type);
 			join_combo_type.setBounds(position_x(2), position_y(1), size_x(1), size_y(1));
 			join_combo_type.addActionListener(this);
-			join_combo_type.setActionCommand("í—Ş•ÏX");
+			join_combo_type.setActionCommand("ç¨®é¡å¤‰æ›´");
 			join_combo_type.setEnabled(false);
 			panel.add(join_combo_type);
-		JButton button4 = new JButton("ƒIƒvƒVƒ‡ƒ“");
+		JButton button4 = new JButton("ã‚ªãƒ—ã‚·ãƒ§ãƒ³");
 			button4.setBounds(position_x(3), position_y(1), size_x(1), size_y(1));
 			button4.setMargin(new Insets(0, 0, 0, 0));
 			button4.addActionListener(this);
-			button4.setActionCommand("ƒIƒvƒVƒ‡ƒ“");
+			button4.setActionCommand("ã‚ªãƒ—ã‚·ãƒ§ãƒ³");
 			panel.add(button4);
 		getContentPane().add(panel, BorderLayout.CENTER);
 		pack();
 		timer = new Timer(500, this);
 		timer.start();
 	}
-	/* ƒCƒxƒ“ƒgˆ——p */
+	/* ã‚¤ãƒ™ãƒ³ãƒˆå‡¦ç†ç”¨ */
 	public void actionPerformed(ActionEvent event){
-		// ƒƒCƒ“ƒEƒBƒ“ƒhƒE‚Ì“ü—Í‚É‘Î‚·‚éˆ—
+		// ãƒ¡ã‚¤ãƒ³ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å…¥åŠ›ã«å¯¾ã™ã‚‹å‡¦ç†
 		String command_str = event.getActionCommand(), mode_str = (String)combo_box1.getSelectedItem();
 //		System.out.println(command_str + " " + mode_str);
 		if(command_str == null){
-			// ƒ^ƒCƒ}[ƒCƒxƒ“ƒg‚Ìˆ—
+			// ã‚¿ã‚¤ãƒãƒ¼ã‚¤ãƒ™ãƒ³ãƒˆã®å‡¦ç†
 			if(option_window.checkbox2.isSelected()){
 				switch(mode_str){
-				case "‰ü‘•":
+				case "æ”¹è£…":
 					nano.unit_frame.addImageX(capture.getImage());
 					break;
 				}
 			}
 			if(option_window.fps != 0){
 				switch(mode_str){
-				case "’Êí":
+				case "é€šå¸¸":
 					savePicture();
 					break;
 				}
@@ -137,12 +137,12 @@ public class main_window extends JFrame implements ActionListener{
 			return;
 		}
 		switch(command_str){
-		case "À•Wæ“¾":
+		case "åº§æ¨™å–å¾—":
 			capture.getKancollePosition();
 			break;
-		case "ƒ‚[ƒh•ÏX":
+		case "ãƒ¢ãƒ¼ãƒ‰å¤‰æ›´":
 			switch(mode_str){
-			case "’Êí":
+			case "é€šå¸¸":
 				nano.unit_frame.setVisible(false);
 				nano.sort_frame.setVisible(false);
 				model_save = new DefaultComboBoxModel(save_type_str);
@@ -162,7 +162,7 @@ public class main_window extends JFrame implements ActionListener{
 					timer.setDelay(1000 * 60 * 60 * 24);
 				}
 				break;
-			case "‰ü‘•":
+			case "æ”¹è£…":
 				nano.unit_frame.setVisible(true);
 				nano.sort_frame.setVisible(false);
 				model_save = new DefaultComboBoxModel();
@@ -183,7 +183,7 @@ public class main_window extends JFrame implements ActionListener{
 					timer.setDelay(1000 * 60 * 60 * 24);
 				}
 				break;
-			case "ƒ\[ƒg":
+			case "ã‚½ãƒ¼ãƒˆ":
 				nano.unit_frame.setVisible(false);
 				nano.sort_frame.setVisible(true);
 				model_save = new DefaultComboBoxModel();
@@ -201,59 +201,59 @@ public class main_window extends JFrame implements ActionListener{
 				break;
 			}
 			break;
-		case "•ûŒü•ÏX":
+		case "æ–¹å‘å¤‰æ›´":
 			switch(mode_str){
-			case "‰ü‘•":
+			case "æ”¹è£…":
 				nano.unit_frame.changeMode(join_combo_dir.getSelectedIndex(), join_combo_type.getSelectedIndex());
 				break;
-			case "ƒ\[ƒg":
+			case "ã‚½ãƒ¼ãƒˆ":
 				nano.sort_frame.changeMode(join_combo_dir.getSelectedIndex(), join_combo_type.getSelectedIndex());
 				break;
 			}
 			break;
-		case "í—Ş•ÏX":
+		case "ç¨®é¡å¤‰æ›´":
 			switch(mode_str){
-			case "‰ü‘•":
+			case "æ”¹è£…":
 				nano.unit_frame.changeMode(join_combo_dir.getSelectedIndex(), join_combo_type.getSelectedIndex());
 				break;
-			case "ƒ\[ƒg":
+			case "ã‚½ãƒ¼ãƒˆ":
 				nano.sort_frame.changeMode(join_combo_dir.getSelectedIndex(), join_combo_type.getSelectedIndex());
 				break;
 			}
 			break;
-		case "‰æ‘œ’Ç‰Á":
+		case "ç”»åƒè¿½åŠ ":
 			switch(mode_str){
-			case "‰ü‘•":
+			case "æ”¹è£…":
 				nano.unit_frame.addImage(capture.getImage());
 				break;
-			case "ƒ\[ƒg":
+			case "ã‚½ãƒ¼ãƒˆ":
 				nano.sort_frame.addImage(capture.getImage());
 				break;
 			}
 			break;
-		case "‰æ‘œ•Û‘¶":
+		case "ç”»åƒä¿å­˜":
 			switch(mode_str){
-			case "’Êí":
+			case "é€šå¸¸":
 				savePicture();
 				break;
-			case "‰ü‘•":
+			case "æ”¹è£…":
 				nano.unit_frame.savePicture();
 				break;
-			case "ƒ\[ƒg":
+			case "ã‚½ãƒ¼ãƒˆ":
 				nano.sort_frame.savePicture();
 				break;
 			}
 			break;
-		case "ƒIƒvƒVƒ‡ƒ“":
+		case "ã‚ªãƒ—ã‚·ãƒ§ãƒ³":
 			nano.option_frame.setVisible(true);
 			break;
 		}
 	}
-	/* ƒeƒLƒXƒgƒGƒŠƒA‚ÉƒeƒLƒXƒg‚ğ’Ç‰Á‚·‚é */
+	/* ãƒ†ã‚­ã‚¹ãƒˆã‚¨ãƒªã‚¢ã«ãƒ†ã‚­ã‚¹ãƒˆã‚’è¿½åŠ ã™ã‚‹ */
 	public static void putLog(String message){
-		text_area.append(message + "\n");
+		text_area.append(message + "Â¥n");
 	}
-	/* ƒIƒuƒWƒFƒNƒg—p’è”‚ğŒvZ‚·‚é */
+	/* ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç”¨å®šæ•°ã‚’è¨ˆç®—ã™ã‚‹ */
 	private static int position_x(int x){
 		return object_space * (x + 1) + object_x * x;
 	}
@@ -266,15 +266,15 @@ public class main_window extends JFrame implements ActionListener{
 	private static int size_y(int y){
 		return object_space * (y - 1) + object_y * y;
 	}
-	/* –¼‘O‰B‚µ‹@”\ */
+	/* åå‰éš ã—æ©Ÿèƒ½ */
 	private static void disableName(BufferedImage image){
 		Graphics graphics = image.getGraphics();
-		// •ê`¶ã‚Ì’ñ“Â–¼
+		// æ¯æ¸¯å·¦ä¸Šã®æç£å
 		if(checkHome(image)){
 			graphics.setColor(new Color(38, 38, 38));
 			graphics.fillRect(111, 0, 162, 25);
 		}
-		// ŠÍ‘ài—ß•”î•ñ
+		// è‰¦éšŠå¸ä»¤éƒ¨æƒ…å ±
 		if(join_window.checkColor(image, 306,276,84,84,84)){
 			if(join_window.checkColor(image, 251,203,35,158,159)){
 				if(join_window.checkColor(image, 272,479,159,155,61)){
@@ -283,7 +283,7 @@ public class main_window extends JFrame implements ActionListener{
 				}
 			}
 		}
-		// ƒ‰ƒ“ƒLƒ“ƒO
+		// ãƒ©ãƒ³ã‚­ãƒ³ã‚°
 		if(join_window.checkColor(image, 87, 189, 79, 152, 139)){
 			if(join_window.checkColor(image, 158, 81, 196, 169, 87)){
 				if(join_window.checkColor(image, 47, 333, 115, 166, 202)){
@@ -292,7 +292,7 @@ public class main_window extends JFrame implements ActionListener{
 				}
 			}
 		}
-		// ‰‰Kˆê——
+		// æ¼”ç¿’ä¸€è¦§
 		if(join_window.checkColor(image, 140, 131, 103, 83, 46)){
 			if(join_window.checkColor(image, 654,119,255,191,96)){
 				if(join_window.checkColor(image, 654,119,255,191,96)){
@@ -309,7 +309,7 @@ public class main_window extends JFrame implements ActionListener{
 				}
 			}
 		}
-		// ‰‰KŒÂ•Ê
+		// æ¼”ç¿’å€‹åˆ¥
 		if(join_window.checkColor(image, 0,0,0,0,0)){
 			if(join_window.checkColor(image, 168,165,17,156,160)){
 				if(join_window.checkColor(image, 635,444,224,217,204)){
@@ -318,7 +318,7 @@ public class main_window extends JFrame implements ActionListener{
 				}
 			}
 		}
-		// í‰Ê•ñ
+		// æˆ¦æœå ±å‘Š
 		if(join_window.checkColor(image, 51,77,255,246,242)){
 			if(join_window.checkColor(image, 395,289,255,246,242)){
 				if(join_window.checkColor(image, 0,0,36,54,63)){
@@ -333,7 +333,7 @@ public class main_window extends JFrame implements ActionListener{
 		if(!join_window.checkColor(image, 665, 42, 83, 159, 73)) return false;
 		return join_window.checkColor(image, 736, 61, 172, 128, 95);
 	}
-	/* ‰æ‘œ•Û‘¶ */
+	/* ç”»åƒä¿å­˜ */
 	private static void savePicture(){
 		try{
 			if(capture.display_index < 0) return;
@@ -341,24 +341,24 @@ public class main_window extends JFrame implements ActionListener{
 			if(flash_image == null) return;
 			String save_name = sdf.format(Calendar.getInstance().getTime()) + ".png";
 			switch((String)combo_box2.getSelectedItem()){
-			case "’Êí":
+			case "é€šå¸¸":
 				if(option_window.checkbox3.isSelected()) disableName(flash_image);
-				putLog("y‰æ‘œ•Û‘¶z");
+				putLog("ã€ç”»åƒä¿å­˜ã€‘");
 				ImageIO.write(flash_image, "png", new File(save_name));
 				break;
-			case "•Ò¬":
+			case "ç·¨æˆ":
 				if(!join_window.checkColor(flash_image, 420,118,195,180,169)) return;
 				if(!join_window.checkColor(flash_image, 506,114,115,180,191)) return;
-				putLog("y‰æ‘œ•Û‘¶z");
+				putLog("ã€ç”»åƒä¿å­˜ã€‘");
 				ImageIO.write(flash_image.getSubimage(100, 94, 700, 386), "png", new File(save_name));
 				break;
-			case "‘Ş":
+			case "è³‡æ":
 				BufferedImage supply_image = new BufferedImage(229, 60, BufferedImage.TYPE_INT_BGR);
 				Graphics graphics = supply_image.getGraphics();
-				graphics.drawImage(flash_image.getSubimage(9, 407, 86, 60), 0, 0, null);	//
-				graphics.drawImage(flash_image.getSubimage(657, 9, 143, 60), 86, 0, null);	//‘Ş
+				graphics.drawImage(flash_image.getSubimage(9, 407, 86, 60), 0, 0, null);	//æ™‚åˆ»
+				graphics.drawImage(flash_image.getSubimage(657, 9, 143, 60), 86, 0, null);	//è³‡æ
 				graphics.dispose();
-				putLog("y‰æ‘œ•Û‘¶z");
+				putLog("ã€ç”»åƒä¿å­˜ã€‘");
 				ImageIO.write(supply_image, "png", new File(save_name));
 				break;
 			}

@@ -1,4 +1,4 @@
-/* ƒ\[ƒgˆê——ƒEƒBƒ“ƒhƒE */
+/* ã‚½ãƒ¼ãƒˆä¸€è¦§ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ */
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -7,8 +7,8 @@ import java.awt.image.BufferedImage;
 import java.awt.geom.Line2D;
 
 public class sort_window extends join_window{
-	/* ƒƒ“ƒo•Ï” */
-	// ’è”
+	/* ãƒ¡ãƒ³ãƒå¤‰æ•° */
+	// å®šæ•°
 	static final int[] position_x = {392, 392, 392};
 	static final int[] position_y = {154, 154, 154};
 	static final int[] block_size_x = {190, 382, 382};
@@ -16,18 +16,18 @@ public class sort_window extends join_window{
 	static final int blocks_x = 7;
 	static final int blocks_y = 5;
 	static final int zooming = 3;
-	public static final String[] show_dir_str  = {"s‚ğ—Dæ", "—ñ‚ğ—Dæ"};
-	public static final String[] show_type_str = {"k¬•\¦", "’Êí•\¦", "Šg’£•\¦"};
-	static final String title = "ƒ\[ƒgˆê——";
+	public static final String[] show_dir_str  = {"è¡Œã‚’å„ªå…ˆ", "åˆ—ã‚’å„ªå…ˆ"};
+	public static final String[] show_type_str = {"ç¸®å°è¡¨ç¤º", "é€šå¸¸è¡¨ç¤º", "æ‹¡å¼µè¡¨ç¤º"};
+	static final String title = "ã‚½ãƒ¼ãƒˆä¸€è¦§";
 	static final BasicStroke wideStroke = new BasicStroke(4.0f);
-	// •Ï”
-	static int show_dir  = 0;	//•\¦•ûŒü(s—DæE—ñ—Dæ)
-	static int show_type = 0;	//•\¦í—Ş(ƒRƒ“ƒpƒNƒgE’ÊíEƒGƒNƒXƒgƒ‰)
-	/* ƒRƒ“ƒXƒgƒ‰ƒNƒ^ */
+	// å¤‰æ•°
+	static int show_dir  = 0;	//è¡¨ç¤ºæ–¹å‘(è¡Œå„ªå…ˆãƒ»åˆ—å„ªå…ˆ)
+	static int show_type = 0;	//è¡¨ç¤ºç¨®é¡(ã‚³ãƒ³ãƒ‘ã‚¯ãƒˆãƒ»é€šå¸¸ãƒ»ã‚¨ã‚¯ã‚¹ãƒˆãƒ©)
+	/* ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ */
 	sort_window(){
 		super();
 	}
-	/* ƒAƒNƒZƒbƒT */
+	/* ã‚¢ã‚¯ã‚»ãƒƒã‚µ */
 	int get_position_x(){return position_x[show_type];}
 	int get_position_y(){return position_y[show_type];}
 	int get_block_size_x(){return block_size_x[show_type];}
@@ -45,21 +45,21 @@ public class sort_window extends join_window{
 	String getWindowTitle(){return title + " - " + show_dir_str[show_dir] + " - " + show_type_str[show_type];}
 	int getIndex(int i){
 		switch(show_dir){
-			case 0:	//s‚ğ—Dæ
+			case 0:	//è¡Œã‚’å„ªå…ˆ
 				return i;
-			case 1:	//—ñ‚ğ—Dæ
+			case 1:	//åˆ—ã‚’å„ªå…ˆ
 				int x = i / blocks_y, y = i % blocks_y;
 				return y * blocks_x + x;
 		}
 		return 0;
 	}
-	/* ‰æ‘œˆ— */
+	/* ç”»åƒå‡¦ç† */
 	void addSpecialFrame(BufferedImage image, int px1, int py1, int px2, int py2){
 		Graphics2D graphics2d = (Graphics2D)image.getGraphics();
 		graphics2d.setStroke(wideStroke);
 		graphics2d.setPaint(Color.BLUE);
 		switch(show_dir){
-			case 0:	//s‚ğ—Dæ
+			case 0:	//è¡Œã‚’å„ªå…ˆ
 				for(int y = 1; y < blocks_y; y++){
 					for(int x = 0; x < blocks_x; x++){
 						if((y != py1) && (y != py2 + 1)){
@@ -68,7 +68,7 @@ public class sort_window extends join_window{
 					}
 				}
 				break;
-			case 1:	//—ñ‚ğ—Dæ
+			case 1:	//åˆ—ã‚’å„ªå…ˆ
 				for(int x = 1; x < blocks_x; x++){
 					for(int y = 0; y < blocks_y; y++){
 						if((x != px1) && (x != px2 + 1)){
@@ -80,7 +80,7 @@ public class sort_window extends join_window{
 		}
 		graphics2d.dispose();
 	}
-	/* ‰æ‘œ”»’è */
+	/* ç”»åƒåˆ¤å®š */
 	boolean checkImage(BufferedImage image){
 		if(checkColor(image, 420, 118, 66,  60,  59) == false) return false;
 		if(checkColor(image, 374,  80, 30, 157, 160) == false) return false;
