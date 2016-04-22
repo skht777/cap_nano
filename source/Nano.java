@@ -14,19 +14,19 @@
  * 以上を実装したらリリースする
  */
 
-public class nano{
-	public static main_window main_frame;
-	public static unit_window unit_frame;
-	public static sort_window sort_frame;
-	public static option_window option_frame;
+public class Nano{
+	public static MainWindow mainFrame;
+	public static UnitWindow unitFrame;
+	public static SortWindow sortFrame;
+	public static OptionWindow optionFrame;
 	public static void main(String args[]){
 		// 改装一覧用
-		unit_frame = new unit_window();
+		unitFrame = new UnitWindow();
 		// ソート一覧用
-		sort_frame = new sort_window();
+		sortFrame = new SortWindow();
 		// メイン画面
-		main_frame = new main_window();
+		mainFrame = new MainWindow();
 		// オプション画面
-		option_frame = new option_window();
+		optionFrame = new OptionWindow();
 	}
 }
