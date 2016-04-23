@@ -2,9 +2,8 @@
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Insets;
+import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -26,9 +25,9 @@ import javax.swing.Timer;
 public class MainWindow extends JFrame implements ActionListener{
 	/* メンバ変数 */
 	// 定数
-	static final int OBJECT_X = 80;
-	static final int OBJECT_Y = 24;
-	static final int OBJECT_SPACE = 10;
+//	static final int OBJECT_X = 80;
+//	static final int OBJECT_Y = 24;
+//	static final int OBJECT_SPACE = 10;
 	static final String SOFTWARE = "記録は大切なの";
 	static final String[] MODE_TYPE_STR = {"通常", "改装", "ソート"};
 	static final String[] SAVE_TYPE_STR = {"通常", "編成", "資材"};
@@ -44,71 +43,71 @@ public class MainWindow extends JFrame implements ActionListener{
 	MainWindow(){
 		// ウィンドウの設定
 		setTitle(SOFTWARE);
-		getContentPane().setPreferredSize(new Dimension(positionX(4), positionY(5)));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
-		setVisible(true);
 		setAlwaysOnTop(true);
+		
 		// オブジェクトの設定
-		JPanel panel = new JPanel();
-		panel.setLayout(null);
 		JButton button1 = new JButton("座標取得");
-			button1.setBounds(positionX(0), positionY(0), sizeX(1), sizeY(1));
-			button1.setMargin(new Insets(0, 0, 0, 0));
-			button1.addActionListener(this);
-			button1.setActionCommand("座標取得");
-			panel.add(button1);
+		button1.addActionListener(this);
+		button1.setActionCommand("座標取得");
+		
 		comboBox1 = new JComboBox<>(MODE_TYPE_STR);
-			comboBox1.setBounds(positionX(1), positionY(0), sizeX(1), sizeY(1));
-			comboBox1.addActionListener(this);
-			comboBox1.setActionCommand("モード変更");
-			panel.add(comboBox1);
+		comboBox1.addActionListener(this);
+		comboBox1.setActionCommand("モード変更");
+		
 		JButton button2 = new JButton("画像追加");
-			button2.setBounds(positionX(2), positionY(0), sizeX(1), sizeY(1));
-			button2.setMargin(new Insets(0, 0, 0, 0));
-			button2.addActionListener(this);
-			button2.setActionCommand("画像追加");
-			button2.setMnemonic(KeyEvent.VK_Z);
-			panel.add(button2);
+		button2.addActionListener(this);
+		button2.setActionCommand("画像追加");
+		button2.setMnemonic(KeyEvent.VK_Z);
+		
 		JButton button3 = new JButton("画像保存");
-			button3.setBounds(positionX(3), positionY(0), sizeX(1), sizeY(1));
-			button3.setMargin(new Insets(0, 0, 0, 0));
-			button3.addActionListener(this);
-			button3.setActionCommand("画像保存");
-			panel.add(button3);
-		textArea = new JTextArea();
-			textArea.setEditable(false);
-			JScrollPane scrollpane = new JScrollPane(textArea);
-			scrollpane.setBounds(positionX(0), positionY(2), sizeX(4), sizeY(3));
-			panel.add(scrollpane);
+		button3.addActionListener(this);
+		button3.setActionCommand("画像保存");
+		
 		modelSave = new DefaultComboBoxModel<>(SAVE_TYPE_STR);
-			comboBox2 = new JComboBox<>(modelSave);
-			comboBox2.setBounds(positionX(0), positionY(1), sizeX(1), sizeY(1));
-			comboBox2.addActionListener(this);
-			comboBox2.setActionCommand("保存種別");
-			panel.add(comboBox2);
+		comboBox2 = new JComboBox<>(modelSave);
+		comboBox2.addActionListener(this);
+		comboBox2.setActionCommand("保存種別");
+		
 		modelDir = new DefaultComboBoxModel<>();
-			joinComboDir = new JComboBox<>(modelDir);
-			joinComboDir.setBounds(positionX(1), positionY(1), sizeX(1), sizeY(1));
-			joinComboDir.addActionListener(this);
-			joinComboDir.setActionCommand("方向変更");
-			joinComboDir.setEnabled(false);
-			panel.add(joinComboDir);
+		joinComboDir = new JComboBox<>(modelDir);
+		joinComboDir.addActionListener(this);
+		joinComboDir.setActionCommand("方向変更");
+		
 		modelType = new DefaultComboBoxModel<>();
-			joinComboType = new JComboBox<>(modelType);
-			joinComboType.setBounds(positionX(2), positionY(1), sizeX(1), sizeY(1));
-			joinComboType.addActionListener(this);
-			joinComboType.setActionCommand("種類変更");
-			joinComboType.setEnabled(false);
-			panel.add(joinComboType);
+		joinComboType = new JComboBox<>(modelType);
+		joinComboType.addActionListener(this);
+		joinComboType.setActionCommand("種類変更");
+		
 		JButton button4 = new JButton("オプション");
-			button4.setBounds(positionX(3), positionY(1), sizeX(1), sizeY(1));
-			button4.setMargin(new Insets(0, 0, 0, 0));
-			button4.addActionListener(this);
-			button4.setActionCommand("オプション");
-			panel.add(button4);
-		getContentPane().add(panel, BorderLayout.CENTER);
+		button4.addActionListener(this);
+		button4.setActionCommand("オプション");
+		
+		textArea = new JTextArea();
+		textArea.setRows(4);
+		textArea.setEditable(false);
+		
+		// オブジェクトの配置
+		getContentPane().setLayout(new BorderLayout(10, 10));
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridLayout(2, 4, 10, 10));
+		panel.add(button1);
+		panel.add(comboBox1);
+		panel.add(button2);
+		panel.add(button3);
+		panel.add(comboBox2);
+		panel.add(joinComboDir);
+		panel.add(joinComboType);
+		panel.add(button4);
+		joinComboDir.setEnabled(false);
+		joinComboType.setEnabled(false);
+		
+		getContentPane().add(panel, BorderLayout.NORTH);
+		getContentPane().add(new JScrollPane(textArea), BorderLayout.SOUTH);
 		pack();
+		setVisible(true);
+		
 		timer = new Timer(500, this);
 		timer.start();
 	}
@@ -251,19 +250,6 @@ public class MainWindow extends JFrame implements ActionListener{
 	/* テキストエリアにテキストを追加する */
 	public static void putLog(String message){
 		textArea.append(message + "¥n");
-	}
-	/* オブジェクト用定数を計算する */
-	private static int positionX(int x){
-		return OBJECT_SPACE * (x + 1) + OBJECT_X * x;
-	}
-	private static int positionY(int y){
-		return OBJECT_SPACE * (y + 1) + OBJECT_Y * y;
-	}
-	private static int sizeX(int x){
-		return OBJECT_SPACE * (x - 1) + OBJECT_X * x;
-	}
-	private static int sizeY(int y){
-		return OBJECT_SPACE * (y - 1) + OBJECT_Y * y;
 	}
 	/* 名前隠し機能 */
 	private static void disableName(BufferedImage image){
