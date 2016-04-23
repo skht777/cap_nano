@@ -60,8 +60,9 @@ public class OptionWindow extends JFrame implements ActionListener{
 		String commandStr = event.getActionCommand();
 		if(commandStr == null) return;
 		if(commandStr.equals("罫線表示")){
-			Nano.sortFrame.panel.repaint();
-			Nano.unitFrame.panel.repaint();
+			// FIXME: 罫線の変更
+			//Nano.sortFrame.panel.repaint();
+			//Nano.unitFrame.panel.repaint();
 		}
 		if(commandStr.equals("自動取得")){
 			if(checkbox2.isSelected()){
