@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.stream.IntStream;
 import java.awt.geom.Line2D;
 
 @SuppressWarnings("serial")
@@ -82,20 +83,13 @@ public class SortWindow extends JoinWindow{
 		graphics2d.dispose();
 	}
 	/* 画像判定 */
+	// FIXME
 	boolean checkImage(BufferedImage image){
-		if(checkColor(image, 420, 118, 66,  60,  59) == false) return false;
-		if(checkColor(image, 374,  80, 30, 157, 160) == false) return false;
-		return true;
+		return checkColor(image, 420, 118, 66,  60,  59) && checkColor(image, 374,  80, 30, 157, 160);
 	}
 	int checkImageX(BufferedImage image){
-		if(checkColor(image, 420, 118, 66,  60,  59) == false) return -1;
-		if(checkColor(image, 374,  80, 30, 157, 160) == false) return -1;
-		for(int i = 0; i < blocksSize; i++){
-			int p = getIndex(i);
-			if(ssBufferFlag.get(p) == false){
-				return p;
-			}
-		}
-		return -1;
+		if(!checkImage(image)) return -1;
+		return IntStream.range(0, blocksSize).map(i->getIndex(i))
+				.filter(p->((ImageLabel) getContentPane().getComponent(p)).hasImage()).findFirst().orElse(-1);
 	}
 }

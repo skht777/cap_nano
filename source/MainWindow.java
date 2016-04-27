@@ -249,7 +249,7 @@ public class MainWindow extends JFrame implements ActionListener{
 	}
 	/* テキストエリアにテキストを追加する */
 	public static void putLog(String message){
-		textArea.append(message + "¥n");
+		textArea.append(message + "\n");
 	}
 	/* 名前隠し機能 */
 	private static void disableName(BufferedImage image){
@@ -314,9 +314,11 @@ public class MainWindow extends JFrame implements ActionListener{
 		}
 		graphics.dispose();
 	}
+	// FIXME: OSやブラウザによる色の違いへの対処が求められる
 	private static boolean checkHome(BufferedImage image){
-		if(!JoinWindow.checkColor(image, 665, 42, 83, 159, 73)) return false;
-		return JoinWindow.checkColor(image, 736, 61, 172, 128, 95);
+		return true;
+		//if(!JoinWindow.checkColor(image, 665, 42, 83, 159, 73)) return false;
+		//return JoinWindow.checkColor(image, 736, 61, 172, 128, 95);
 	}
 	/* 画像保存 */
 	private static void savePicture(){

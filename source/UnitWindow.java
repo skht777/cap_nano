@@ -130,11 +130,12 @@ public class UnitWindow extends JoinWindow{
 		graphics2d.dispose();
 	}
 	/* 画像判定 */
+	// FIXME
 	boolean checkImage(BufferedImage image){
 		return checkColor(image, 300, 172, 241, 191, 119);
 	}
 	int checkImageX(BufferedImage image){
-		if(!checkColor(image, 300, 172, 241, 191, 119)) return -1;
+		if(!checkImage(image)) return -1;
 		for(int i = 0; i < 4; i++){
 			if(checkColor(image, 136 + 30 * i, 122, 33, 150, 151)){
 				for(int j = 0; j < 6; j++){
