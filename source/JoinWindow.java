@@ -9,10 +9,10 @@
  * 30 31 32 33 34 35
  */
 
+import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
@@ -20,6 +20,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -47,35 +48,68 @@ abstract class JoinWindow extends JFrame{
 	// 定数
 	static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss-SSS");
 	// 変数
-	int blocksSize, type = -1;
+	private int zooming = 0;	// 実画像に対するウインドウの縮小率
+	private int sortType  = 0;	// 表示方向(行優先・列優先・艦隊優先)
+	private int sizeType = 0;	// 表示種類(コンパクト・通常・エクストラ)
+	Dimension blockSize;
 	/* コンストラクタ */
-	JoinWindow(){
+	JoinWindow(Dimension blockSize, GridLayout blockLayout, int zooming){
+		this.zooming = zooming;
+		this.blockSize = blockSize;
 		// ウィンドウ・オブジェクトの設定
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setResizable(false);
 		setAlwaysOnTop(true);
 		addKeyListener(getKeyListener());
 		setTransferHandler(getDropFileHandler());
-		blocksSize = getBlocksX() * getBlocksY();
-		redraw();
+		// ウィンドウにおける設定
+		setTitle(getWindowTitle());
+		getContentPane().setPreferredSize(
+				new Dimension(blockSize.width * blockLayout.getRows() / zooming, blockSize.height * blockLayout.getColumns() / zooming));
+		// オブジェクトにおける設定
+		getContentPane().setLayout(blockLayout);
+		getContentPane().setBackground(Color.WHITE);
+		IntStream.range(0, blockLayout.getRows() * blockLayout.getColumns()).map(this::getIndex)
+		.mapToObj(i->new ImageLabel()).forEach(l->getContentPane().add(l));
+		pack();
 	}
 	/* アクセッサ */
 	abstract int getPositionX();
 	abstract int getPositionY();
-	abstract int getBlockSizeX();
-	abstract int getBlockSizeY();
-	abstract int getBlocksX();
-	abstract int getBlocksY();
-	abstract void setDir(int dir);
-	abstract void setType(int type);
-	abstract int getBlockSizeX_();
-	abstract int getBlockSizeY_();
-	abstract int getSX(int x);
-	abstract int getSY(int y);
-	abstract int getSX_(int x);
-	abstract int getSY_(int y);
 	abstract String getWindowTitle();
-	abstract int getIndex(int i);
+	protected abstract float getStrokeSize();
+	protected int getBlockSizeX(){return blockSize.width;}
+	protected int getBlockSizeY(){return blockSize.height;}
+	protected int getBlocksX(){return ((GridLayout) getContentPane().getLayout()).getRows();}
+	protected int getBlocksY(){return ((GridLayout) getContentPane().getLayout()).getColumns();}
+	protected int getBlockSizeX_(){return getBlockSizeX() / zooming;}
+	protected int getBlockSizeY_(){return getBlockSizeY() / zooming;}
+	protected int getSX(int x){return getBlockSizeX() * x;}
+	protected int getSY(int y){return getBlockSizeY() * y;}
+	protected int getSX_(int x){return getBlockSizeX_() * x;}
+	protected int getSY_(int y){return getBlockSizeY_() * y;}
+	protected int getIndex(int i){
+		switch(sortType){
+			case 0:	//行を優先
+				return i;
+			case 1:	//列を優先
+				int x = i / getBlocksX(), y = i % getBlocksY();
+				return y * getBlocksX() + x;
+			case 2:	//ハイブリッド
+				return new int[]{
+					1,  2,  7,  8,  13, 14,
+					3,  4,  9,  10, 15, 16,
+					5,  6,  11, 12, 17, 18,
+					19, 20, 25, 26, 31, 32, 
+					21, 22, 27, 28, 33, 34,
+					23, 24, 29, 30, 35, 36}[i];
+		}
+		return 0;
+	}
+	protected int getSortType(){return sortType;}
+	protected int getSizeType(){return sizeType;}
+	void setSortType(int type){sortType = type;}
+	void setSizeType(int type){sizeType = type;}
 	/* キーイベント */
 	private KeyAdapter getKeyListener(){
 		return new KeyAdapter(){
@@ -106,30 +140,21 @@ abstract class JoinWindow extends JFrame{
 	}
 	/* 表示を更新する */
 	void redraw(){
-		// ウィンドウにおける設定
-		setTitle(getWindowTitle());
-		getContentPane().setPreferredSize(new Dimension(getSX_(getBlocksX()), getSY_(getBlocksY())));
-		// オブジェクトにおける設定
-		getContentPane().setLayout(new GridLayout(getBlocksY(), getBlocksX(), 0, 0));
-		getContentPane().setBackground(Color.WHITE);
-		IntStream.range(0, blocksSize).map(this::getIndex).mapToObj(i->new ImageLabel()).forEach(l->getContentPane().add(l));
-		pack();
+		
 	}
 	/* コンボボックスの状態から、ウィンドウの表示を変更する */
 	public void changeMode(int dir, int type){
-		setDir(dir);
-		setType(type);
-		if(this.type != type) this.type = type;
-		redraw();
+		//setSortType(dir);
+		//setType(type);
+		pack();
 	}
 	/* 画像を追加する */
 	public void addImage(BufferedImage image){
 		if(image == null || !checkImage(image)) return;
-		Arrays.stream(getContentPane().getComponents()).map(c->(ImageLabel) c).filter(il->!il.hasImage()).findFirst().ifPresent(target->{
+		Arrays.stream(getContentPane().getComponents()).map(c->(ImageLabel) c).filter(il->!il.hasImage()).findFirst().ifPresent(il->{
 			MainWindow.putLog("【画像追加】");
-			target.setImage(image.getSubimage(getPositionX(), getPositionY(), target.getWidth(), target.getHeight())
-					.getScaledInstance(getBlockSizeX_(), getBlockSizeY_(), Image.SCALE_AREA_AVERAGING));
-			MainWindow.putLog("位置：" + target.toString());		
+			il.setImage(image.getSubimage(getPositionX(), getPositionY(), getBlockSizeX(), getBlockSizeY()));
+			MainWindow.putLog("位置：" + il.toString());		
 		});
 	}
 	public void addImage(File file) {
@@ -145,13 +170,36 @@ abstract class JoinWindow extends JFrame{
 		.map(p->(ImageLabel) getContentPane().getComponent(getIndex(p))).ifPresent(il->{
 			// image != null && p >= 0 の際に実行される
 			MainWindow.putLog("【自動取得】");
-			il.setImage(image.getSubimage(getPositionX(), getPositionY(), getBlockSizeX(), getBlockSizeY())
-					.getScaledInstance(getBlockSizeX_(), getBlockSizeY_(), Image.SCALE_AREA_AVERAGING));
+			il.setImage(image.getSubimage(getPositionX(), getPositionY(), getBlockSizeX(), getBlockSizeY()));
 			MainWindow.putLog("位置：" + il.toString());
 		});	
 	}
 	/* 画像を保存する */
-	abstract void addSpecialFrame(BufferedImage image, int px1, int py1, int px2, int py2);
+	private boolean exclude(int arg, int ...excludes){
+		return !IntStream.of(excludes).anyMatch(exclude->exclude == arg);
+	}
+	private void drawFrame(Graphics2D graphics, double x1, double y1, double x2, double y2){
+		graphics.draw(new Line2D.Double(x1 * getBlockSizeX(), y1 * getBlockSizeY(), x2 * getBlockSizeX(), y2 * getBlockSizeY()));
+	}
+	protected void addSpecialFrame(Graphics2D graphics, int px1, int py1, int px2, int py2){
+		graphics.setStroke(new BasicStroke(getStrokeSize()));
+		graphics.setPaint(Color.BLUE);
+		switch(getSortType()){
+			case 0:	//行を優先
+				IntStream.range(1, getBlocksY()).filter(y->exclude(y, py1, py2 + 1)).forEach(y->IntStream.range(0, getBlocksX())
+						.forEach(x->drawFrame(graphics, x, y, x + 1, y)));
+				break;
+			case 1:	//列を優先
+				IntStream.range(1, getBlocksX()).filter(x->exclude(x, py1, py2 + 1)).forEach(x->IntStream.range(0, getBlocksX())
+						.forEach(y->drawFrame(graphics, x, y, x, y + 1)));
+				break;
+			case 2:	//艦隊優先
+				IntStream.range(0, getBlocksX()).filter(x->exclude(3, py1, py2 + 1)).forEach(x->drawFrame(graphics, x, 3, x + 1, 3));
+				IntStream.range(0, getBlocksY()).filter(x->exclude(2, py1, py2 + 1)).forEach(x->drawFrame(graphics, 2, 0, 2, getBlocksY()));
+				IntStream.range(0, getBlocksY()).filter(x->exclude(2, py1, py2 + 1)).forEach(x->drawFrame(graphics, 4, 0, 4, getBlocksY()));
+				break;
+		}
+	}
 	public void savePicture(){
 		// 最大領域を判断する(左隅のラベルと右隅のラベルを取得する)
 		List<ImageLabel> list = Arrays.stream(getContentPane().getComponents())
@@ -163,15 +211,20 @@ abstract class JoinWindow extends JFrame{
 		if(min.equals(max)) return;
 		// 保存用バッファに画像を配置する
 		MainWindow.putLog("【画像保存】");
+		// * ZOOMING
 		BufferedImage saveBuffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_BGR);
-		Graphics graphics = saveBuffer.getGraphics();
+		Graphics2D graphics = saveBuffer.createGraphics();
+		// * ZOOMING
 		list.forEach(il->graphics.drawImage(il.getImage(), il.getX(), il.getY(), this));
 		graphics.dispose();
 		// 特殊な枠線を追加する
-		if(OptionWindow.checkbox1.isSelected()) addSpecialFrame(saveBuffer, min.getIndexX(), min.getIndexY(), max.getIndexX(), max.getIndexY());
+		if(OptionWindow.checkbox1.isSelected()) 
+			addSpecialFrame(graphics, min.getIndexX(), min.getIndexY(), max.getIndexX(), max.getIndexY());
+		graphics.dispose();
 		// 画像の保存処理
 		String saveName = DATE_FORMAT.format(Calendar.getInstance().getTime()) + ".png";
 		try{
+			// * ZOOMING
 			ImageIO.write(saveBuffer.getSubimage(min.getX(), min.getY(), max.getX() + min.getWidth(), max.getY() + min.getHeight()), "png", new File(saveName));
 		}
 		catch(Exception error){
@@ -231,7 +284,8 @@ abstract class JoinWindow extends JFrame{
 		}
 		public void setImage(Image image) {
 			this.image = image;
-			setIcon(image == null ? null : new ImageIcon(this.image));
+			setIcon(image == null ? null : new ImageIcon(this.image
+					.getScaledInstance(getWidth(), getHeight(), Image.SCALE_AREA_AVERAGING)));
 		}
 		public void clearImage() {
 			setImage(null);
@@ -240,12 +294,8 @@ abstract class JoinWindow extends JFrame{
 			return getIcon() != null;
 		}
 		@Override
-		public boolean equals(Object obj) {
-			return toString().equals(((Component)obj).toString());
-		}
-		@Override
 		public String toString() {
-			return String.format("(%d,%d)", getIndexX(), getAlignmentY());
+			return String.format("(%d,%d)", getIndexX(), getIndexY());
 		}
 		/* マウスイベント */
 		private MouseAdapter getMouseListener(){
