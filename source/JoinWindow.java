@@ -12,353 +12,334 @@
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.TransferHandler;
-import javax.swing.border.StrokeBorder;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 
 @SuppressWarnings("serial")
-abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, MouseMotionListener{
+abstract class JoinWindow extends JFrame{
 	/* メンバ変数 */
 	// 定数
-	static final float FRAME_WIDTH = 4.0f;
 	static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss-SSS");
 	// 変数
-	boolean pressFlag = false;
-	int windowX, windowY, blocksSize, pressPosition, enterPosition, type = -1;
-	BufferedImage showImage, blankImage;
-	List<BufferedImage> ssBuffer;
-	List<Boolean> ssBufferFlag;
-	List<JLabel> imageLabel;
+	private int zooming = 0;	// 実画像に対するウインドウの縮小率
+	private int sortType  = 0;	// 表示方向(行優先・列優先・艦隊優先)
+	private int sizeType = 0;	// 表示種類(コンパクト・通常・エクストラ)
+	Dimension blockSize;
 	/* コンストラクタ */
-	JoinWindow(){
+	JoinWindow(Dimension blockSize, GridLayout blockLayout, int zooming){
+		this.zooming = zooming;
+		this.blockSize = blockSize;
 		// ウィンドウ・オブジェクトの設定
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setResizable(false);
 		setAlwaysOnTop(true);
-		addKeyListener(this);
-		addMouseListener(this);
-		addMouseMotionListener(this);
-		windowX = getSX_(getBlocksX());
-		windowY = getSY_(getBlocksY());
-		redraw();
-		setTransferHandler(new DropFileHandler());
-		// バッファの設定
-		blocksSize = getBlocksX() * getBlocksY();
-		ssBuffer = new ArrayList<>();
-		ssBufferFlag = new ArrayList<>();
-		blankImage = new BufferedImage(Capture.FLASH_X, Capture.FLASH_Y, BufferedImage.TYPE_INT_BGR);
-		Graphics graphics = blankImage.getGraphics();
-		graphics.setColor(Color.white);
-		graphics.fillRect(0, 0, Capture.FLASH_X, Capture.FLASH_Y);
-		for(int i = 0; i < blocksSize; i++){
-			ssBuffer.add(clone(blankImage));
-			ssBufferFlag.add(false);
-		}
-		showImage = new BufferedImage(windowX, windowY, BufferedImage.TYPE_INT_BGR);
-		graphics = showImage.getGraphics();
-		graphics.setColor(Color.white);
-		graphics.fillRect(0, 0, windowX, windowY);
-		graphics.dispose();
+		addKeyListener(getKeyListener());
+		setTransferHandler(getDropFileHandler());
+		// ウィンドウにおける設定
+		setTitle(getWindowTitle());
+		getContentPane().setPreferredSize(
+				new Dimension(blockSize.width * blockLayout.getRows() / zooming, blockSize.height * blockLayout.getColumns() / zooming));
+		// オブジェクトにおける設定
+		getContentPane().setLayout(blockLayout);
+		getContentPane().setBackground(Color.WHITE);
+		IntStream.range(0, blockLayout.getRows() * blockLayout.getColumns()).map(this::getIndex)
+		.mapToObj(i->new ImageLabel()).forEach(l->getContentPane().add(l));
+		pack();
 	}
 	/* アクセッサ */
 	abstract int getPositionX();
 	abstract int getPositionY();
-	abstract int getBlockSizeX();
-	abstract int getBlockSizeY();
-	abstract int getBlocksX();
-	abstract int getBlocksY();
-	abstract void setDir(int dir);
-	abstract void setType(int type);
-	abstract int getBlockSizeX_();
-	abstract int getBlockSizeY_();
-	abstract int getSX(int x);
-	abstract int getSY(int y);
-	abstract int getSX_(int x);
-	abstract int getSY_(int y);
 	abstract String getWindowTitle();
-	abstract int getIndex(int i);
-	/* マウスイベント */
-	public void mouseClicked(MouseEvent event){
-		// ダブルクリックした際は、その場所の記録画像を消去する
-		if (event.getClickCount() < 2) return;
-		int deletePosition = getPosition(event);
-		if(ssBufferFlag.get(deletePosition) == false) return;
-		MainWindow.putLog("【画像削除】");
-			// showImage(画面表示)上での削除
-			int x = deletePosition % getBlocksX(), y = deletePosition / getBlocksX();
-			Graphics graphics = showImage.getGraphics();
-			graphics.setColor(Color.white);
-			graphics.fillRect(getSX_(x), getSY_(y), getBlockSizeX_(), getBlockSizeY_());
-			graphics.dispose();
-			// バッファの削除
-			ssBuffer.set(deletePosition, clone(blankImage));
-			// フラグの削除
-			ssBufferFlag.set(deletePosition, false);
-		MainWindow.putLog("追加位置：(" + x+  "," + y + ")");
-	}
-	public void mousePressed(MouseEvent event){
-		if(!pressFlag){
-			// マウスを押した際は、押した位置を記憶しておく
-			pressPosition = getPosition(event);
-			pressFlag = true;
-		}else{
-			// マウスでドラッグしている間は、対象の位置も記憶して処理する
-			enterPosition = getPosition(event);
+	protected abstract float getStrokeSize();
+	protected int getBlockSizeX(){return blockSize.width;}
+	protected int getBlockSizeY(){return blockSize.height;}
+	protected int getBlocksX(){return ((GridLayout) getContentPane().getLayout()).getRows();}
+	protected int getBlocksY(){return ((GridLayout) getContentPane().getLayout()).getColumns();}
+	protected int getBlockSizeX_(){return getBlockSizeX() / zooming;}
+	protected int getBlockSizeY_(){return getBlockSizeY() / zooming;}
+	protected int getSX(int x){return getBlockSizeX() * x;}
+	protected int getSY(int y){return getBlockSizeY() * y;}
+	protected int getSX_(int x){return getBlockSizeX_() * x;}
+	protected int getSY_(int y){return getBlockSizeY_() * y;}
+	protected int getIndex(int i){
+		switch(sortType){
+			case 0:	//行を優先
+				return i;
+			case 1:	//列を優先
+				int x = i / getBlocksX(), y = i % getBlocksY();
+				return y * getBlocksX() + x;
+			case 2:	//ハイブリッド
+				return new int[]{
+					1,  2,  7,  8,  13, 14,
+					3,  4,  9,  10, 15, 16,
+					5,  6,  11, 12, 17, 18,
+					19, 20, 25, 26, 31, 32, 
+					21, 22, 27, 28, 33, 34,
+					23, 24, 29, 30, 35, 36}[i];
 		}
+		return 0;
 	}
-	public void mouseReleased(MouseEvent event){
-		// マウスを離した際は、その位置のマスとの交換を行う
-		if(pressFlag == false) return;
-		int releasePosition = getPosition(event);
-		if(pressPosition != releasePosition){
-			MainWindow.putLog("【画像交換】");
-				// showImage(画面表示)上での交換
-				int x1 =   pressPosition % getBlocksX(), y1 =   pressPosition / getBlocksX();
-				int x2 = releasePosition % getBlocksX(), y2 = releasePosition / getBlocksX();
-				BufferedImage temp1 = clone(showImage.getSubimage(getSX_(x1), getSY_(y1), getBlockSizeX_(), getBlockSizeY_()));
-				BufferedImage temp2 = clone(showImage.getSubimage(getSX_(x2), getSY_(y2), getBlockSizeX_(), getBlockSizeY_()));
-				Graphics graphics = showImage.getGraphics();
-				graphics.drawImage(temp1, getSX_(x2), getSY_(y2), this);
-				graphics.drawImage(temp2, getSX_(x1), getSY_(y1), this);
-				graphics.dispose();
-				// バッファの交換
-				BufferedImage buffer2 = clone(ssBuffer.get(pressPosition));
-				ssBuffer.set(pressPosition, clone(ssBuffer.get(releasePosition)));
-				ssBuffer.set(releasePosition, buffer2);
-				// フラグの交換
-				boolean flag = ssBufferFlag.get(pressPosition);
-				ssBufferFlag.set(pressPosition, ssBufferFlag.get(releasePosition));
-				ssBufferFlag.set(releasePosition, flag);
-			MainWindow.putLog("(" + x2 + "," + y2 + ")⇔(" + x1 + "," + y1 + ")");
-		}
-		pressFlag = false;
-	}
-	public void mouseEntered(MouseEvent event){}
-	public void mouseExited(MouseEvent event){}
-	public void mouseMoved(MouseEvent event){}
-	public void mouseDragged(MouseEvent event){
-		enterPosition = getPosition(event);
-	}
+	protected int getSortType(){return sortType;}
+	protected int getSizeType(){return sizeType;}
+	void setSortType(int type){sortType = type;}
+	void setSizeType(int type){sizeType = type;}
 	/* キーイベント */
-	public void keyPressed(KeyEvent event){
-		// Alt+Zに反応する
-		int keycode = event.getKeyCode();
-		if (keycode != KeyEvent.VK_Z) return;
-		int modifer = event.getModifiersEx();
-		if((modifer & InputEvent.ALT_DOWN_MASK) != 0){
-			addImage(Capture.getImage());
-		}
+	private KeyAdapter getKeyListener(){
+		return new KeyAdapter(){
+			@Override
+			public void keyPressed(KeyEvent event){
+				// Alt+Zに反応する
+				if(event.getKeyCode() == KeyEvent.VK_Z && event.isAltDown()) addImage(Capture.getImage());
+			}
+		};
 	}
-	public void keyReleased(KeyEvent e){}
-	public void keyTyped(KeyEvent e){}
+	/* ドロップイベント */
+	private TransferHandler getDropFileHandler(){
+		return new TransferHandler() {
+			@Override
+			@SuppressWarnings("unchecked")
+			public boolean importData(TransferSupport support){
+				// ドロップされていないかドロップされたものがファイルではない場合は受け取らない
+				if(!support.isDrop() && support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) return false;
+				// ドロップ処理、ファイルを受け取り順番に読み込んで追加する
+				try {
+					((List<File>) support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)).forEach(file->addImage(file));
+				}catch(Exception e) {
+					e.printStackTrace();
+				}
+				return true;
+			}
+		};
+	}
 	/* 表示を更新する */
 	void redraw(){
-		// ウィンドウにおける設定
-		setTitle(getWindowTitle());
-		getContentPane().setPreferredSize(new Dimension(windowX, windowY));
-		setLocationRelativeTo(null);
-		// オブジェクトにおける設定
-		getContentPane().setLayout(new GridLayout(getBlocksY(), getBlocksX(), 0, 0));
-		getContentPane().setBackground(Color.WHITE);
-		imageLabel = IntStream.range(0, getBlocksY() * getBlocksX()).mapToObj(i->{
-			JLabel label = new JLabel();
-			label.setBorder(new StrokeBorder(new BasicStroke(0.5f)));
-			return label;
-		}).collect(Collectors.toList());
-		imageLabel.forEach(label->getContentPane().add(label));
-		pack();
+		
 	}
 	/* コンボボックスの状態から、ウィンドウの表示を変更する */
 	public void changeMode(int dir, int type){
-		setDir(dir);
-		setType(type);
-		if(this.type != type){
-			windowX = getSX_(getBlocksX());
-			windowY = getSY_(getBlocksY());
-			showImage = new BufferedImage(windowX, windowY, BufferedImage.TYPE_INT_BGR);
-			Graphics graphics = showImage.getGraphics();
-			for(int x = 0; x < getBlocksX(); x++){
-				for(int y = 0; y < getBlocksY(); y++){
-					BufferedImage temp = ssBuffer.get(y * getBlocksX() + x).getSubimage(getPositionX(), getPositionY(), getBlockSizeX(), getBlockSizeY());
-					graphics.drawImage(temp.getScaledInstance(getBlockSizeX_(), getBlockSizeY_(), Image.SCALE_AREA_AVERAGING), getSX_(x), getSY_(y), this);
-				}
-			}
-			graphics.dispose();
-			this.type = type;
-		}
-		redraw();
+		//setSortType(dir);
+		//setType(type);
+		pack();
 	}
 	/* 画像を追加する */
 	public void addImage(BufferedImage image){
-		if(image == null) return;
-		if(checkImage(image) == false) return;
-		for(int i = 0; i < blocksSize; i++){
-			int p = getIndex(i);
-			if(ssBufferFlag.get(p) == false){
-				MainWindow.putLog("【画像追加】");
-					ssBuffer.set(p, image);
-					ssBufferFlag.set(p, true);
-					int px = p % getBlocksX(), py = p / getBlocksX();
-					BufferedImage temp = image.getSubimage(getPositionX(), getPositionY(), getBlockSizeX(), getBlockSizeY());
-					Graphics graphics = showImage.getGraphics();
-					graphics.drawImage(temp.getScaledInstance(getBlockSizeX_(), getBlockSizeY_(), Image.SCALE_AREA_AVERAGING), getSX_(px), getSY_(py), this);
-					graphics.dispose();					
-				MainWindow.putLog("位置：(" + px + "," + py + ")");
-				return;
-			}
+		if(image == null || !checkImage(image)) return;
+		Arrays.stream(getContentPane().getComponents()).map(c->(ImageLabel) c).filter(il->!il.hasImage()).findFirst().ifPresent(il->{
+			MainWindow.putLog("【画像追加】");
+			il.setImage(image.getSubimage(getPositionX(), getPositionY(), getBlockSizeX(), getBlockSizeY()));
+			MainWindow.putLog("位置：" + il.toString());		
+		});
+	}
+	public void addImage(File file) {
+		try {
+			addImage(ImageIO.read(file));
+		}catch(IOException error) {
+			error.printStackTrace();
 		}
 	}
 	/* 画像を追加する(位置認識Ver) */
 	public void addImageX(BufferedImage image){
-		if(image == null) return;
-		int position = checkImageX(image);
-		if(position < 0) return;
-		position = getIndex(position);
-		MainWindow.putLog("【自動取得】");
-			ssBuffer.set(position, image);
-			ssBufferFlag.set(position, true);
-			int px = position % getBlocksX(), py = position / getBlocksX();
-			BufferedImage temp = image.getSubimage(getPositionX(), getPositionY(), getBlockSizeX(), getBlockSizeY());
-			Graphics graphics = showImage.getGraphics();
-			graphics.drawImage(temp.getScaledInstance(getBlockSizeX_(), getBlockSizeY_(), Image.SCALE_AREA_AVERAGING), getSX_(px), getSY_(py), this);
-			graphics.dispose();
-		MainWindow.putLog("位置：(" + px + "," + py + ")");
+		Optional.ofNullable(image).map(this::checkImageX).filter(p->p >= 0)
+		.map(p->(ImageLabel) getContentPane().getComponent(getIndex(p))).ifPresent(il->{
+			// image != null && p >= 0 の際に実行される
+			MainWindow.putLog("【自動取得】");
+			il.setImage(image.getSubimage(getPositionX(), getPositionY(), getBlockSizeX(), getBlockSizeY()));
+			MainWindow.putLog("位置：" + il.toString());
+		});	
 	}
 	/* 画像を保存する */
-	abstract void addSpecialFrame(BufferedImage image, int px1, int py1, int px2, int py2);
-	public void savePicture(){
-		// 最大領域を判断する
-		int px1 = getBlocksX(), py1 = getBlocksY(), px2 = -1, py2 = -1;
-		for(int x = 0; x < getBlocksX(); x++){
-			for(int y = 0; y < getBlocksY(); y++){
-				if(ssBufferFlag.get(y * getBlocksX() + x)){
-					px1 = Math.min(px1, x);
-					py1 = Math.min(py1, y);
-					px2 = Math.max(px2, x);
-					py2 = Math.max(py2, y);
-				}
-			}
+	private boolean exclude(int arg, int ...excludes){
+		return !IntStream.of(excludes).anyMatch(exclude->exclude == arg);
+	}
+	private void drawFrame(Graphics2D graphics, double x1, double y1, double x2, double y2){
+		graphics.draw(new Line2D.Double(x1 * getBlockSizeX(), y1 * getBlockSizeY(), x2 * getBlockSizeX(), y2 * getBlockSizeY()));
+	}
+	protected void addSpecialFrame(Graphics2D graphics, int px1, int py1, int px2, int py2){
+		graphics.setStroke(new BasicStroke(getStrokeSize()));
+		graphics.setPaint(Color.BLUE);
+		switch(getSortType()){
+			case 0:	//行を優先
+				IntStream.range(1, getBlocksY()).filter(y->exclude(y, py1, py2 + 1)).forEach(y->IntStream.range(0, getBlocksX())
+						.forEach(x->drawFrame(graphics, x, y, x + 1, y)));
+				break;
+			case 1:	//列を優先
+				IntStream.range(1, getBlocksX()).filter(x->exclude(x, py1, py2 + 1)).forEach(x->IntStream.range(0, getBlocksX())
+						.forEach(y->drawFrame(graphics, x, y, x, y + 1)));
+				break;
+			case 2:	//艦隊優先
+				IntStream.range(0, getBlocksX()).filter(x->exclude(3, py1, py2 + 1)).forEach(x->drawFrame(graphics, x, 3, x + 1, 3));
+				IntStream.range(0, getBlocksY()).filter(x->exclude(2, py1, py2 + 1)).forEach(x->drawFrame(graphics, 2, 0, 2, getBlocksY()));
+				IntStream.range(0, getBlocksY()).filter(x->exclude(2, py1, py2 + 1)).forEach(x->drawFrame(graphics, 4, 0, 4, getBlocksY()));
+				break;
 		}
-		if(px2 - px1 < 0) return;
+	}
+	public void savePicture(){
+		// 最大領域を判断する(左隅のラベルと右隅のラベルを取得する)
+		List<ImageLabel> list = Arrays.stream(getContentPane().getComponents())
+				.map(c->(ImageLabel) c).filter(ImageLabel::hasImage).collect(Collectors.toList());
+		ImageLabel min = (ImageLabel) getContentPane().getComponentAt(list.stream().mapToInt(ImageLabel::getX).min().getAsInt(), 
+				list.stream().mapToInt(ImageLabel::getY).min().getAsInt());
+		ImageLabel max = (ImageLabel) getContentPane().getComponentAt(list.stream().mapToInt(ImageLabel::getX).max().getAsInt(), 
+				list.stream().mapToInt(ImageLabel::getY).max().getAsInt());
+		if(min.equals(max)) return;
 		// 保存用バッファに画像を配置する
 		MainWindow.putLog("【画像保存】");
-		BufferedImage saveBuffer = new BufferedImage(getSX(getBlocksX()), getSY(getBlocksY()), BufferedImage.TYPE_INT_BGR);
-		Graphics graphics = saveBuffer.getGraphics();
-		for(int x = 0; x < getBlocksX(); x++){
-			for(int y = 0; y < getBlocksY(); y++){
-				BufferedImage temp = ssBuffer.get(y * getBlocksX() + x).getSubimage(getPositionX(), getPositionY(), getBlockSizeX(), getBlockSizeY());
-				graphics.drawImage(temp, getSX(x), getSY(y), this);
-			}
-		}
+		// * ZOOMING
+		BufferedImage saveBuffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_BGR);
+		Graphics2D graphics = saveBuffer.createGraphics();
+		// * ZOOMING
+		list.forEach(il->graphics.drawImage(il.getImage(), il.getX(), il.getY(), this));
 		graphics.dispose();
 		// 特殊な枠線を追加する
-		if(OptionWindow.checkbox1.isSelected()){
-			addSpecialFrame(saveBuffer, px1, py1, px2, py2);
-		}
+		if(OptionWindow.checkbox1.isSelected()) 
+			addSpecialFrame(graphics, min.getIndexX(), min.getIndexY(), max.getIndexX(), max.getIndexY());
+		graphics.dispose();
 		// 画像の保存処理
 		String saveName = DATE_FORMAT.format(Calendar.getInstance().getTime()) + ".png";
 		try{
-			ImageIO.write(saveBuffer.getSubimage(px1 * getBlockSizeX(), py1 * getBlockSizeY(), (px2 - px1 + 1) * getBlockSizeX(), (py2 - py1 + 1) * getBlockSizeY()), "png", new File(saveName));
-			MainWindow.putLog(saveName);
-			int option = JOptionPane.showConfirmDialog(this, "画像をクリアしますか？", "記録は大切なの", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-			if(option == JOptionPane.YES_OPTION){
-				// showImageの削除
-				graphics = showImage.getGraphics();
-				graphics.setColor(Color.white);
-				graphics.fillRect(0, 0, windowX, windowY);
-				graphics.dispose();
-				// バッファ・フラグの削除
-				for(int i = 0; i < blocksSize; i++){
-					ssBuffer.set(i, clone(blankImage));
-					ssBufferFlag.set(i, false);
-				}
-			}
+			// * ZOOMING
+			ImageIO.write(saveBuffer.getSubimage(min.getX(), min.getY(), max.getX() + min.getWidth(), max.getY() + min.getHeight()), "png", new File(saveName));
 		}
 		catch(Exception error){
 			error.printStackTrace();
+		}
+		MainWindow.putLog(saveName);
+		int option = JOptionPane.showConfirmDialog(this, "画像をクリアしますか？", "記録は大切なの", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+		if(option == JOptionPane.YES_OPTION){
+			Arrays.stream(getContentPane().getComponents()).map(c->(ImageLabel) c).forEach(ImageLabel::clearImage);
 		}
 	}
 	/* 画像判定 */
 	abstract boolean checkImage(BufferedImage image);
 	abstract int checkImageX(BufferedImage image);
+	// FIXME: OSやブラウザによる色の違いへの対処が求められる
 	public static boolean checkColor(BufferedImage image, int x, int y, int r, int g, int b){
-		Color color = new Color(image.getRGB(x, y));
-		int diffR = color.getRed() - r, diffG = color.getGreen() - g, diffB = color.getBlue() - b;
-		int diff = diffR * diffR + diffG * diffG + diffB * diffB;
-		if(diff < 500) return true;
-		return false;
+		return true;
+//		Color color = new Color(image.getRGB(x, y));
+//		int diffR = color.getRed() - r, diffG = color.getGreen() - g, diffB = color.getBlue() - b;
+//		int diff = diffR * diffR + diffG * diffG + diffB * diffB;
+//		if(diff < 500) return true;
+//		return false;
 	}
-	/* 座標取得 */
-	int getPosition(MouseEvent event){
-		Point point = event.getPoint();
-		int mx = point.x / getBlockSizeX_(), my = point.y / getBlockSizeY_();
-		if(mx < 0) mx = 0;
-		if(mx >= getBlocksX()) mx = getBlocksX() - 1;
-		if(my < 0) my = 0;
-		if(my >= getBlocksY()) my = getBlocksY() - 1;
-		return my * getBlocksX() + mx;
-	}
-	/* 画像をディープコピーする */
-	BufferedImage clone(BufferedImage image){
-		BufferedImage clone = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-		Graphics graphics = clone.createGraphics();
-		graphics.drawImage(image, 0, 0, null);
-		graphics.dispose();
-		return clone;
-	}
-	class DropFileHandler extends TransferHandler{
-		@Override
-		public boolean canImport(TransferSupport support){
-			// ドロップされていない場合は受け取らない
-			if(!support.isDrop()) return false;
-			// ドロップされたものがファイルではない場合は受け取らない
-			if(!support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) return false;
-			return true;
+	protected static class ImageLabel extends JLabel{
+		private Image image;
+		// ウインドウの枠線
+		private enum LINE{
+			NORMAL(new LineBorder(Color.BLACK, 1)),
+			RED(new LineBorder(Color.RED, 4)),
+			BLUE(new LineBorder(Color.BLUE, 4));
+			private Border border;
+			private LINE(Border border) {
+				this.border = border;
+			}
+			void set(JComponent ...targets) {
+				Arrays.stream(targets).forEach(target->target.setBorder(border));
+			}
+		}
+		public ImageLabel() {
+			super();
+			// 枠線を描画する
+			LINE.NORMAL.set(this);
+			addMouseListener(getMouseListener());
+		}
+		private static void changeColor(MouseEvent event, LINE line) {
+			Optional.of(event).filter(e->e.getButton() > 0).map(e->(JComponent) e.getSource())
+			.filter(target->!LINE.RED.border.equals(target.getBorder())).ifPresent(target->line.set(target));
+		}
+		public int getIndexX() {
+			return getX() / getWidth();
+		}
+		public int getIndexY() {
+			return getY() / getHeight();
+		}
+		public Image getImage() {
+			return image;
+		}
+		public void setImage(Image image) {
+			this.image = image;
+			setIcon(image == null ? null : new ImageIcon(this.image
+					.getScaledInstance(getWidth(), getHeight(), Image.SCALE_AREA_AVERAGING)));
+		}
+		public void clearImage() {
+			setImage(null);
+		}
+		public boolean hasImage(){
+			return getIcon() != null;
 		}
 		@Override
-		public boolean importData(TransferSupport support){
-			// 受け取っていいものか確認する
-			if(!canImport(support)) return false;
-			// ドロップ処理
-			Transferable transferable = support.getTransferable();
-			try{
-				// ファイルを受け取る
-				@SuppressWarnings("unchecked")
-				List<File> files = (List<File>)transferable.getTransferData(DataFlavor.javaFileListFlavor);
-				// 順番に読み込んで追加する
-				for(File file : files){
-					BufferedImage loadImage = ImageIO.read(file);
-					addImage(loadImage);
+		public String toString() {
+			return String.format("(%d,%d)", getIndexX(), getIndexY());
+		}
+		/* マウスイベント */
+		private MouseAdapter getMouseListener(){
+			return new MouseAdapter(){
+				@Override
+				public void mouseClicked(MouseEvent event){
+					// ダブルクリックした際は、その場所の記録画像を消去する
+					Optional.of(event).filter(e->e.getClickCount() >= 2).map(e->(ImageLabel) e.getSource()).filter(ImageLabel::hasImage).ifPresent(il->{
+						MainWindow.putLog("【画像削除】");
+						il.clearImage();
+						MainWindow.putLog("追加位置：" +  il.toString());
+					});
 				}
-			}
-			catch(Exception error){
-				error.printStackTrace();
-			}
-			return true;
+				@Override
+				public void mousePressed(MouseEvent event){
+					// マウスを押した際は押した位置のラベルを変更する
+					LINE.RED.set((JComponent) event.getSource());
+				}
+				@Override
+				public void mouseReleased(MouseEvent event){
+					// マウスを離した際は、その位置のマスとの交換を行う
+					ImageLabel pressed = (ImageLabel) event.getSource();
+					ImageLabel released = (ImageLabel) pressed.getParent().getComponentAt(pressed.getX() + event.getX(), pressed.getY() + event.getY());
+					if(released != null && !pressed.equals(released)){
+						MainWindow.putLog("【画像交換】");
+						// 画像を入れ替える
+						Image temp = pressed.getImage();
+						pressed.setImage(released.getImage());
+						released.setImage(temp);
+						MainWindow.putLog(pressed.toString() + "⇔" + released.toString());
+					}
+					LINE.NORMAL.set(pressed, released);
+				}
+				@Override
+				public void mouseEntered(MouseEvent event){
+					// マウスがラベル上に重なった歳は、その位置のラベルを変更する
+					ImageLabel.changeColor(event, LINE.BLUE);
+				}
+				@Override
+				public void mouseExited(MouseEvent event){
+					// マウスがラベルから離れた際はその位置のラベルを元に戻す
+					ImageLabel.changeColor(event, LINE.NORMAL);
+				}
+			};
 		}
 	}
 }
