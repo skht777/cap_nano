@@ -11,15 +11,12 @@ import javax.swing.JFrame;
 public class OptionWindow extends JFrame implements ActionListener{
 	/* メンバ変数 */
 	// 定数
-//	static final int OBJECTX = 80;
-//	static final int OBJECTY = 24;
-//	static final int OBJECT_SPACE = 10;
 	static final int[] FPS_INT = {0, 1, 2, 3, 5, 10};
 	static final String[] FPS_STR = {"無効", "1fps", "2fps", "3fps", "5fps", "10fps"};
 	// 変数
-	public static int fps;
-	public static JCheckBox checkbox1, checkbox2, checkbox3;
-	static JComboBox<String> comboBox;
+	private int fps;
+	private JCheckBox checkbox1, checkbox2, checkbox3;
+	private JComboBox<String> comboBox;
 	/* コンストラクタ */
 	OptionWindow(){
 		// ウィンドウの設定
@@ -57,41 +54,41 @@ public class OptionWindow extends JFrame implements ActionListener{
 	}
 	/* イベント処理用 */
 	public void actionPerformed(ActionEvent event){
-		String commandStr = event.getActionCommand();
-		if(commandStr == null) return;
-		if(commandStr.equals("罫線表示")){
-			// FIXME: 罫線の変更
-			//Nano.sortFrame.panel.repaint();
-			//Nano.unitFrame.panel.repaint();
-		}
-		if(commandStr.equals("自動取得")){
-			if(checkbox2.isSelected()){
-				if(MainWindow.comboBox1.getSelectedIndex() != 0){
-					MainWindow.timer.restart();
-					MainWindow.timer.setDelay(500);
-				}
-			}else{
-				if(MainWindow.comboBox1.getSelectedIndex() != 0){
-					MainWindow.timer.setDelay(1000 * 60 * 60 * 24);
-				}
-			}
-		}
-		if(commandStr.equals("fps変更")){
-			fps = FPS_INT[comboBox.getSelectedIndex()];
-			if(fps != 0){
-				MainWindow.putLog("【連射機能】");
-				MainWindow.putLog("fps：" + fps + "fps");
-				if(MainWindow.comboBox1.getSelectedIndex() == 0){
-					MainWindow.timer.restart();
-					MainWindow.timer.setDelay(1000 / fps);
-				}
-			}else{
-				MainWindow.putLog("【連射機能】");
-				MainWindow.putLog("fps：OFF");
-				if(MainWindow.comboBox1.getSelectedIndex() == 0){
-					MainWindow.timer.setDelay(1000 * 60 * 60 * 24);
-				}
-			}
-		}
+//		String commandStr = event.getActionCommand();
+//		if(commandStr == null) return;
+//		if(commandStr.equals("罫線表示")){
+//			// FIXME: 罫線の変更
+//			//Nano.sortFrame.panel.repaint();
+//			//Nano.unitFrame.panel.repaint();
+//		}
+//		if(commandStr.equals("自動取得")){
+//			if(checkbox2.isSelected()){
+//				if(MainWindow.comboBox1.getSelectedIndex() != 0){
+//					MainWindow.timer.restart();
+//					MainWindow.timer.setDelay(500);
+//				}
+//			}else{
+//				if(MainWindow.comboBox1.getSelectedIndex() != 0){
+//					MainWindow.timer.setDelay(1000 * 60 * 60 * 24);
+//				}
+//			}
+//		}
+//		if(commandStr.equals("fps変更")){
+//			fps = FPS_INT[comboBox.getSelectedIndex()];
+//			if(fps != 0){
+//				MainWindow.putLog("【連射機能】");
+//				MainWindow.putLog("fps：" + fps + "fps");
+//				if(MainWindow.comboBox1.getSelectedIndex() == 0){
+//					MainWindow.timer.restart();
+//					MainWindow.timer.setDelay(1000 / fps);
+//				}
+//			}else{
+//				MainWindow.putLog("【連射機能】");
+//				MainWindow.putLog("fps：OFF");
+//				if(MainWindow.comboBox1.getSelectedIndex() == 0){
+//					MainWindow.timer.setDelay(1000 * 60 * 60 * 24);
+//				}
+//			}
+//		}
 	}
 }

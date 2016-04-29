@@ -15,18 +15,8 @@
  */
 
 public class Nano{
-	public static MainWindow mainFrame;
-	public static UnitWindow unitFrame;
-	public static SortWindow sortFrame;
-	public static OptionWindow optionFrame;
 	public static void main(String args[]){
-		// 改装一覧用
-		unitFrame = new UnitWindow();
-		// ソート一覧用
-		sortFrame = new SortWindow();
 		// メイン画面
-		mainFrame = new MainWindow();
-		// オプション画面
-		optionFrame = new OptionWindow();
+		new MainWindow();
 	}
 }

@@ -12,7 +12,6 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import javax.imageio.ImageIO;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -25,20 +24,16 @@ import javax.swing.Timer;
 public class MainWindow extends JFrame implements ActionListener{
 	/* メンバ変数 */
 	// 定数
-//	static final int OBJECT_X = 80;
-//	static final int OBJECT_Y = 24;
-//	static final int OBJECT_SPACE = 10;
 	static final String SOFTWARE = "記録は大切なの";
 	static final String[] MODE_TYPE_STR = {"通常", "改装", "ソート"};
 	static final String[] SAVE_TYPE_STR = {"通常", "編成", "資材"};
 	static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss-SSS");
 	// 変数
-	static int saveType = 0;
-	public static JComboBox<String> comboBox1;
-	static JComboBox<String> comboBox2, joinComboDir, joinComboType;
-	static DefaultComboBoxModel<String> modelSave, modelDir, modelType;
+	private int saveType = 0;
+	private JComboBox<String> comboBox1;
+	private JComboBox<String> comboBox2, joinComboDir, joinComboType;
 	public static JTextArea textArea;
-	public static Timer timer;
+	private Timer timer;
 	/* コンストラクタ */
 	MainWindow(){
 		// ウィンドウの設定
@@ -49,8 +44,7 @@ public class MainWindow extends JFrame implements ActionListener{
 		
 		// オブジェクトの設定
 		JButton button1 = new JButton("座標取得");
-		button1.addActionListener(this);
-		button1.setActionCommand("座標取得");
+		button1.addActionListener(e->Capture.getKancollePosition());
 		
 		comboBox1 = new JComboBox<>(MODE_TYPE_STR);
 		comboBox1.addActionListener(this);
@@ -65,24 +59,20 @@ public class MainWindow extends JFrame implements ActionListener{
 		button3.addActionListener(this);
 		button3.setActionCommand("画像保存");
 		
-		modelSave = new DefaultComboBoxModel<>(SAVE_TYPE_STR);
-		comboBox2 = new JComboBox<>(modelSave);
+		comboBox2 = new JComboBox<>(SAVE_TYPE_STR);
 		comboBox2.addActionListener(this);
 		comboBox2.setActionCommand("保存種別");
 		
-		modelDir = new DefaultComboBoxModel<>();
-		joinComboDir = new JComboBox<>(modelDir);
+		joinComboDir = new JComboBox<>();
 		joinComboDir.addActionListener(this);
 		joinComboDir.setActionCommand("方向変更");
 		
-		modelType = new DefaultComboBoxModel<>();
-		joinComboType = new JComboBox<>(modelType);
+		joinComboType = new JComboBox<>();
 		joinComboType.addActionListener(this);
 		joinComboType.setActionCommand("種類変更");
 		
 		JButton button4 = new JButton("オプション");
-		button4.addActionListener(this);
-		button4.setActionCommand("オプション");
+		button4.addActionListener(e->new OptionWindow());
 		
 		textArea = new JTextArea();
 		textArea.setRows(4);
@@ -118,83 +108,66 @@ public class MainWindow extends JFrame implements ActionListener{
 //		System.out.println(commandStr + " " + modeStr);
 		if(commandStr == null){
 			// タイマーイベントの処理
-			if(OptionWindow.checkbox2.isSelected()){
-				switch(modeStr){
-				case "改装":
-					Nano.unitFrame.addImageX(Capture.getImage());
-					break;
-				}
-			}
-			if(OptionWindow.fps != 0){
-				switch(modeStr){
-				case "通常":
-					savePicture();
-					break;
-				}
-			}
+//			if(OptionWindow.checkbox2.isSelected()){
+//				switch(modeStr){
+//				case "改装":
+//					//Nano.unitFrame.addImageX(Capture.getImage());
+//					break;
+//				}
+//			}
+//			if(OptionWindow.fps != 0){
+//				switch(modeStr){
+//				case "通常":
+//					savePicture();
+//					break;
+//				}
+//			}
 			return;
 		}
 		switch(commandStr){
-		case "座標取得":
-			Capture.getKancollePosition();
-			break;
 		case "モード変更":
 			switch(modeStr){
 			case "通常":
-				Nano.unitFrame.setVisible(false);
-				Nano.sortFrame.setVisible(false);
-				modelSave = new DefaultComboBoxModel<>(SAVE_TYPE_STR);
-				modelDir  = new DefaultComboBoxModel<>();
-				modelType = new DefaultComboBoxModel<>();
-				modelSave.setSelectedItem(modelSave.getElementAt(saveType));
-				comboBox2.setModel(modelSave);
-				joinComboDir.setModel(modelDir);
-				joinComboType.setModel(modelType);
-				comboBox2.setEnabled(true);
 				joinComboDir.setEnabled(false);
 				joinComboType.setEnabled(false);
-				if(OptionWindow.fps != 0){
-					MainWindow.timer.restart();
-					timer.setDelay(1000 / OptionWindow.fps);
-				}else{
-					timer.setDelay(1000 * 60 * 60 * 24);
-				}
+//				if(OptionWindow.fps != 0){
+//					MainWindow.timer.restart();
+//					timer.setDelay(1000 / OptionWindow.fps);
+//				}else{
+//					timer.setDelay(1000 * 60 * 60 * 24);
+//				}
 				break;
 			case "改装":
-				Nano.unitFrame.setVisible(true);
-				Nano.sortFrame.setVisible(false);
-				modelSave = new DefaultComboBoxModel<>();
-				modelDir  = new DefaultComboBoxModel<>(UnitWindow.SHOW_DIR_STR);
-				modelType = new DefaultComboBoxModel<>(UnitWindow.SHOW_TYPE_STR);
-				modelDir.setSelectedItem(modelDir.getElementAt(UnitWindow.showDir));
-				modelType.setSelectedItem(modelType.getElementAt(UnitWindow.showType));
-				comboBox2.setModel(modelSave);
-				joinComboDir.setModel(modelDir);
-				joinComboType.setModel(modelType);
-				comboBox2.setEnabled(false);
 				joinComboDir.setEnabled(true);
 				joinComboType.setEnabled(true);
-				if(OptionWindow.checkbox2.isSelected()){
-					MainWindow.timer.restart();
-					timer.setDelay(500);
-				}else{
-					timer.setDelay(1000 * 60 * 60 * 24);
-				}
+//				Nano.unitFrame.setVisible(true);
+//				Nano.sortFrame.setVisible(false);
+//				modelSave = new DefaultComboBoxModel<>();
+//				modelDir  = new DefaultComboBoxModel<>(UnitWindow.SHOW_DIR_STR);
+//				modelType = new DefaultComboBoxModel<>(UnitWindow.SHOW_TYPE_STR);
+//				modelDir.setSelectedItem(modelDir.getElementAt(UnitWindow.showDir));
+//				modelType.setSelectedItem(modelType.getElementAt(UnitWindow.showType));
+//				if(OptionWindow.checkbox2.isSelected()){
+//					MainWindow.timer.restart();
+//					timer.setDelay(500);
+//				}else{
+//					timer.setDelay(1000 * 60 * 60 * 24);
+//				}
 				break;
 			case "ソート":
-				Nano.unitFrame.setVisible(false);
-				Nano.sortFrame.setVisible(true);
-				modelSave = new DefaultComboBoxModel<>();
-				modelDir  = new DefaultComboBoxModel<>(SortWindow.SHOW_DIR_STR);
-				modelType = new DefaultComboBoxModel<>(SortWindow.SHOW_TYPE_STR);
-				modelDir.setSelectedItem(modelDir.getElementAt(SortWindow.showDir));
-				modelType.setSelectedItem(modelType.getElementAt(SortWindow.showType));
-				comboBox2.setModel(modelSave);
-				joinComboDir.setModel(modelDir);
-				joinComboType.setModel(modelType);
-				comboBox2.setEnabled(false);
 				joinComboDir.setEnabled(true);
 				joinComboType.setEnabled(true);
+//				Nano.unitFrame.setVisible(false);
+//				Nano.sortFrame.setVisible(true);
+//				modelSave = new DefaultComboBoxModel<>();
+//				modelDir  = new DefaultComboBoxModel<>(SortWindow.SHOW_DIR_STR);
+//				modelType = new DefaultComboBoxModel<>(SortWindow.SHOW_TYPE_STR);
+//				modelDir.setSelectedItem(modelDir.getElementAt(SortWindow.showDir));
+//				modelType.setSelectedItem(modelType.getElementAt(SortWindow.showType));
+//				comboBox2.setModel(modelSave);
+//				joinComboDir.setModel(modelDir);
+//				joinComboType.setModel(modelType);
+//				comboBox2.setEnabled(false);
 				timer.setDelay(1000 * 60 * 60 * 24);
 				break;
 			}
@@ -202,30 +175,30 @@ public class MainWindow extends JFrame implements ActionListener{
 		case "方向変更":
 			switch(modeStr){
 			case "改装":
-				Nano.unitFrame.changeMode(joinComboDir.getSelectedIndex(), joinComboType.getSelectedIndex());
+				//Nano.unitFrame.changeMode(joinComboDir.getSelectedIndex(), joinComboType.getSelectedIndex());
 				break;
 			case "ソート":
-				Nano.sortFrame.changeMode(joinComboDir.getSelectedIndex(), joinComboType.getSelectedIndex());
+				//Nano.sortFrame.changeMode(joinComboDir.getSelectedIndex(), joinComboType.getSelectedIndex());
 				break;
 			}
 			break;
 		case "種類変更":
 			switch(modeStr){
 			case "改装":
-				Nano.unitFrame.changeMode(joinComboDir.getSelectedIndex(), joinComboType.getSelectedIndex());
+				//Nano.unitFrame.changeMode(joinComboDir.getSelectedIndex(), joinComboType.getSelectedIndex());
 				break;
 			case "ソート":
-				Nano.sortFrame.changeMode(joinComboDir.getSelectedIndex(), joinComboType.getSelectedIndex());
+				//Nano.sortFrame.changeMode(joinComboDir.getSelectedIndex(), joinComboType.getSelectedIndex());
 				break;
 			}
 			break;
 		case "画像追加":
 			switch(modeStr){
 			case "改装":
-				Nano.unitFrame.addImage(Capture.getImage());
+				//Nano.unitFrame.addImage(Capture.getImage());
 				break;
 			case "ソート":
-				Nano.sortFrame.addImage(Capture.getImage());
+				//Nano.sortFrame.addImage(Capture.getImage());
 				break;
 			}
 			break;
@@ -235,15 +208,12 @@ public class MainWindow extends JFrame implements ActionListener{
 				savePicture();
 				break;
 			case "改装":
-				Nano.unitFrame.savePicture();
+				//Nano.unitFrame.savePicture();
 				break;
 			case "ソート":
-				Nano.sortFrame.savePicture();
+				//Nano.sortFrame.savePicture();
 				break;
 			}
-			break;
-		case "オプション":
-			Nano.optionFrame.setVisible(true);
 			break;
 		}
 	}
@@ -252,7 +222,7 @@ public class MainWindow extends JFrame implements ActionListener{
 		textArea.append(message + "\n");
 	}
 	/* 名前隠し機能 */
-	private static void disableName(BufferedImage image){
+	private void disableName(BufferedImage image){
 		Graphics graphics = image.getGraphics();
 		// 母港左上の提督名
 		if(checkHome(image)){
@@ -315,13 +285,13 @@ public class MainWindow extends JFrame implements ActionListener{
 		graphics.dispose();
 	}
 	// FIXME: OSやブラウザによる色の違いへの対処が求められる
-	private static boolean checkHome(BufferedImage image){
+	private boolean checkHome(BufferedImage image){
 		return true;
 		//if(!JoinWindow.checkColor(image, 665, 42, 83, 159, 73)) return false;
 		//return JoinWindow.checkColor(image, 736, 61, 172, 128, 95);
 	}
 	/* 画像保存 */
-	private static void savePicture(){
+	private void savePicture(){
 		try{
 			if(Capture.displayIndex < 0) return;
 			BufferedImage flashImage = Capture.getImage();
@@ -329,7 +299,7 @@ public class MainWindow extends JFrame implements ActionListener{
 			String saveName = DATE_FORMAT.format(Calendar.getInstance().getTime()) + ".png";
 			switch((String)comboBox2.getSelectedItem()){
 			case "通常":
-				if(OptionWindow.checkbox3.isSelected()) disableName(flashImage);
+				//if(OptionWindow.checkbox3.isSelected()) disableName(flashImage);
 				putLog("【画像保存】");
 				ImageIO.write(flashImage, "png", new File(saveName));
 				break;

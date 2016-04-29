@@ -200,7 +200,7 @@ abstract class JoinWindow extends JFrame{
 				break;
 		}
 	}
-	public void savePicture(){
+	public void savePicture(boolean addFrame){
 		// 最大領域を判断する(左隅のラベルと右隅のラベルを取得する)
 		List<ImageLabel> list = Arrays.stream(getContentPane().getComponents())
 				.map(c->(ImageLabel) c).filter(ImageLabel::hasImage).collect(Collectors.toList());
@@ -218,7 +218,7 @@ abstract class JoinWindow extends JFrame{
 		list.forEach(il->graphics.drawImage(il.getImage(), il.getX(), il.getY(), this));
 		graphics.dispose();
 		// 特殊な枠線を追加する
-		if(OptionWindow.checkbox1.isSelected()) 
+		if(addFrame) 
 			addSpecialFrame(graphics, min.getIndexX(), min.getIndexY(), max.getIndexX(), max.getIndexY());
 		graphics.dispose();
 		// 画像の保存処理
