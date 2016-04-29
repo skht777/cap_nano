@@ -10,11 +10,10 @@
  */
 
 import java.awt.BasicStroke;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
@@ -25,19 +24,21 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.TransferHandler;
+import javax.swing.border.StrokeBorder;
 
 @SuppressWarnings("serial")
 abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, MouseMotionListener{
@@ -49,9 +50,9 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 	boolean pressFlag = false;
 	int windowX, windowY, blocksSize, pressPosition, enterPosition, type = -1;
 	BufferedImage showImage, blankImage;
-	public JoinPanel panel;
 	List<BufferedImage> ssBuffer;
 	List<Boolean> ssBufferFlag;
+	List<JLabel> imageLabel;
 	/* コンストラクタ */
 	JoinWindow(){
 		// ウィンドウ・オブジェクトの設定
@@ -118,18 +119,15 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 			// フラグの削除
 			ssBufferFlag.set(deletePosition, false);
 		MainWindow.putLog("追加位置：(" + x+  "," + y + ")");
-		panel.repaint();
 	}
 	public void mousePressed(MouseEvent event){
 		if(!pressFlag){
 			// マウスを押した際は、押した位置を記憶しておく
 			pressPosition = getPosition(event);
 			pressFlag = true;
-			panel.repaint();
 		}else{
 			// マウスでドラッグしている間は、対象の位置も記憶して処理する
 			enterPosition = getPosition(event);
-			panel.repaint();
 		}
 	}
 	public void mouseReleased(MouseEvent event){
@@ -158,14 +156,12 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 			MainWindow.putLog("(" + x2 + "," + y2 + ")⇔(" + x1 + "," + y1 + ")");
 		}
 		pressFlag = false;
-		panel.repaint();
 	}
 	public void mouseEntered(MouseEvent event){}
 	public void mouseExited(MouseEvent event){}
 	public void mouseMoved(MouseEvent event){}
 	public void mouseDragged(MouseEvent event){
 		enterPosition = getPosition(event);
-		panel.repaint();
 	}
 	/* キーイベント */
 	public void keyPressed(KeyEvent event){
@@ -186,10 +182,15 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 		getContentPane().setPreferredSize(new Dimension(windowX, windowY));
 		setLocationRelativeTo(null);
 		// オブジェクトにおける設定
-		panel = new JoinPanel();
-		getContentPane().add(panel, BorderLayout.CENTER);
+		getContentPane().setLayout(new GridLayout(getBlocksY(), getBlocksX(), 0, 0));
+		getContentPane().setBackground(Color.WHITE);
+		imageLabel = IntStream.range(0, getBlocksY() * getBlocksX()).mapToObj(i->{
+			JLabel label = new JLabel();
+			label.setBorder(new StrokeBorder(new BasicStroke(0.5f)));
+			return label;
+		}).collect(Collectors.toList());
+		imageLabel.forEach(label->getContentPane().add(label));
 		pack();
-		panel.repaint();
 	}
 	/* コンボボックスの状態から、ウィンドウの表示を変更する */
 	public void changeMode(int dir, int type){
@@ -225,8 +226,7 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 					BufferedImage temp = image.getSubimage(getPositionX(), getPositionY(), getBlockSizeX(), getBlockSizeY());
 					Graphics graphics = showImage.getGraphics();
 					graphics.drawImage(temp.getScaledInstance(getBlockSizeX_(), getBlockSizeY_(), Image.SCALE_AREA_AVERAGING), getSX_(px), getSY_(py), this);
-					graphics.dispose();
-					panel.repaint();
+					graphics.dispose();					
 				MainWindow.putLog("位置：(" + px + "," + py + ")");
 				return;
 			}
@@ -246,7 +246,6 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 			Graphics graphics = showImage.getGraphics();
 			graphics.drawImage(temp.getScaledInstance(getBlockSizeX_(), getBlockSizeY_(), Image.SCALE_AREA_AVERAGING), getSX_(px), getSY_(py), this);
 			graphics.dispose();
-			panel.repaint();
 		MainWindow.putLog("位置：(" + px + "," + py + ")");
 	}
 	/* 画像を保存する */
@@ -297,7 +296,6 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 					ssBuffer.set(i, clone(blankImage));
 					ssBufferFlag.set(i, false);
 				}
-				panel.repaint();
 			}
 		}
 		catch(Exception error){
@@ -331,38 +329,6 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 		graphics.drawImage(image, 0, 0, null);
 		graphics.dispose();
 		return clone;
-	}
-	/* 別クラス */
-	class JoinPanel extends JPanel{
-		@Override
-		public void paintComponent(Graphics graphics){
-			// 背景の絵を描写する
-			graphics.drawImage(showImage, 0, 0, this);
-			Graphics2D graphics2d = (Graphics2D)graphics;
-			// マーカーを描写する
-			if(pressFlag){
-				BasicStroke wideStroke = new BasicStroke(FRAME_WIDTH);
-				graphics2d.setStroke(wideStroke);
-				int x1 = pressPosition % getBlocksX(), y1 = pressPosition / getBlocksX();
-				int x2 = enterPosition % getBlocksX(), y2 = enterPosition / getBlocksX();
-				graphics2d.setPaint(Color.BLUE);
-				graphics2d.draw(new Rectangle2D.Double(getSX_(x1) + FRAME_WIDTH / 2, getSY_(y1) + FRAME_WIDTH / 2, getBlockSizeX_() - FRAME_WIDTH, getBlockSizeY_() - FRAME_WIDTH));
-				graphics2d.setPaint(Color.RED);
-				graphics2d.draw(new Rectangle2D.Double(getSX_(x2) + FRAME_WIDTH / 2, getSY_(y2) + FRAME_WIDTH / 2, getBlockSizeX_() - FRAME_WIDTH, getBlockSizeY_() - FRAME_WIDTH));
-				BasicStroke normalStroke = new BasicStroke(1.0f);
-				graphics2d.setStroke(normalStroke);
-				graphics2d.setPaint(Color.BLACK);
-			}
-			// 枠線を描写する
-			for(int x = 1; x <= getBlocksX() - 1; x++){
-				graphics2d.draw(new Line2D.Double(getSX_(x), 0, getSX_(x), windowY));
-			}
-			for(int y = 1; y <= getBlocksY() - 1; y++){
-				graphics2d.draw(new Line2D.Double(0, getSY_(y), windowX, getSY_(y)));
-			}
-			graphics.dispose();
-			graphics2d.dispose();
-		}
 	}
 	class DropFileHandler extends TransferHandler{
 		@Override
