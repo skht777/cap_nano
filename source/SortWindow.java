@@ -11,8 +11,7 @@ public class SortWindow extends JoinWindow{
 	// 定数
 	static final int POSITION_X = 392;
 	static final int POSITION_Y = 154;
-	static final int[] BLOCK_SIZE_X = {190, 382, 382};
-	static final int[] BLOCK_SIZE_Y = {279, 279, 315};
+	static final Dimension[] BLOCK_SIZE = {new Dimension(190, 279), new Dimension(382, 279), new Dimension(382, 315)};
 	static final int BLOCKS_X = 7;
 	static final int BLOCKS_Y = 5;
 	static final int ZOOMING = 3;
@@ -21,7 +20,7 @@ public class SortWindow extends JoinWindow{
 	static final String TITLE = "ソート一覧";
 	/* コンストラクタ */
 	SortWindow(){
-		super(new Dimension(BLOCK_SIZE_X[0], BLOCK_SIZE_Y[0]), new GridLayout(BLOCKS_X, BLOCKS_Y, 0, 0), ZOOMING);
+		super(new Dimension(BLOCK_SIZE[0].width, BLOCK_SIZE[0].height), new GridLayout(BLOCKS_X, BLOCKS_Y, 0, 0), ZOOMING);
 	}
 	/* アクセッサ */
 	int getPositionX(){return POSITION_X;}
