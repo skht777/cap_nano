@@ -2,6 +2,9 @@
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Vector;
 import java.awt.event.ActionEvent;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -10,15 +13,11 @@ import javax.swing.JFrame;
 @SuppressWarnings("serial")
 public class OptionWindow extends JFrame implements ActionListener{
 	/* メンバ変数 */
-	// 定数
-	static final int[] FPS_INT = {0, 1, 2, 3, 5, 10};
-	static final String[] FPS_STR = {"無効", "1fps", "2fps", "3fps", "5fps", "10fps"};
 	// 変数
-	private int fps;
 	private JCheckBox checkbox1, checkbox2, checkbox3;
-	private JComboBox<String> comboBox;
+	private JComboBox<Pair<Integer>> comboBox;
 	/* コンストラクタ */
-	OptionWindow(){
+	OptionWindow(OptionData option){
 		// ウィンドウの設定
 		setTitle("オプション");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -38,9 +37,8 @@ public class OptionWindow extends JFrame implements ActionListener{
 		checkbox3.addActionListener(this);
 		checkbox3.setActionCommand("名前隠し");
 		
-		comboBox = new JComboBox<>(FPS_STR);
-		comboBox.addActionListener(this);
-		comboBox.setActionCommand("fps変更");
+		comboBox = new JComboBox<>(new Vector<>(option.getFPSList()));
+		comboBox.addActionListener(option.getFPSAction());
 		
 		// オブジェクトの配置
 		getContentPane().setLayout(new FlowLayout(10, 10, 10));

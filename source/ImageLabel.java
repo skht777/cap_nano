@@ -33,6 +33,11 @@ class ImageLabel extends JLabel{
 		LINE.NORMAL.set(this);
 		addMouseListener(getMouseListener());
 	}
+	public static void swapImage(ImageLabel il1, ImageLabel il2) {
+		Image temp = il1.getImage();
+		il1.setImage(il2.getImage());
+		il2.setImage(temp);
+	}
 	private static void changeColor(MouseEvent event, ImageLabel.LINE line) {
 		Optional.of(event).filter(e->e.getButton() > 0).map(e->(JComponent) e.getSource())
 		.filter(target->!LINE.RED.border.equals(target.getBorder())).ifPresent(target->line.set(target));
@@ -86,9 +91,7 @@ class ImageLabel extends JLabel{
 				if(released != null && !pressed.equals(released)){
 					MainWindow.putLog("【画像交換】");
 					// 画像を入れ替える
-					Image temp = pressed.getImage();
-					pressed.setImage(released.getImage());
-					released.setImage(temp);
+					swapImage(pressed, released);
 					MainWindow.putLog(pressed.toString() + "⇔" + released.toString());
 				}
 				LINE.NORMAL.set(pressed, released);
