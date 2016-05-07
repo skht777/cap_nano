@@ -40,7 +40,7 @@ public class JoinWindow extends JFrame implements Capturable{
 	private IntUnaryOperator sort;	// 表示方向(行優先・列優先・艦隊優先)
 	private Dimension size;			// 表示種類(コンパクト・通常・エクストラ)
 	private FrameOption option;
-	private String sortName, sizeName;
+	private String sortName = "", sizeName = "";
 	/* コンストラクタ */
 	JoinWindow(FrameOption option){
 		this.option = option;
@@ -53,26 +53,30 @@ public class JoinWindow extends JFrame implements Capturable{
 		// ウィンドウにおける設定
 		setSizeType(option.getSizeList().get(0));
 		setSortType(option.getSortList().get(0));
-		setTitle(String.format("%s-%s-%s", option.toString(), sortName, sizeName));
 		// オブジェクトにおける設定
 		getContentPane().setLayout(option.getBlocks());
 		getContentPane().setBackground(Color.WHITE);
-		IntStream.range(0, option.getRow() * option.getColumn()).map(this::getIndex)
-		.mapToObj(i->new ImageLabel()).forEach(l->getContentPane().add(l));
-		validate();
+		
+		IntStream.range(0, option.getRow() * option.getColumn()).forEach(i->getContentPane().add(new ImageLabel()));
 	}
 	/* アクセッサ */
 	public int getIndex(int i){return sort.applyAsInt(i);}
-	public void setSortType(Pair<IntUnaryOperator> type){
+	public void setSortType(SortType type){
 		sortName = type.toString();
-		sort = type.getValue();
+		sort = type.getMethod(option);
 		IntStream.range(0, getContentPane().getComponentCount()).forEach(i->
 		ImageLabel.swapImage((ImageLabel) getContentPane().getComponent(i), (ImageLabel) getContentPane().getComponent(getIndex(i))));
+		redraw();
 	}
 	public void setSizeType(Pair<Dimension> type){
 		sizeName = type.toString();
 		size = type.getValue();
 		if(!type.getValue().equals(getPreferredSize())) setPreferredSize(option.getWindowSize(type.getValue()));
+		redraw();
+	}
+	/* 表示を更新する */
+	private void redraw(){
+		setTitle(String.format("%s一覧-%s-%s", option.toString(), sortName, sizeName));
 		pack();
 		validate();
 	}
@@ -88,18 +92,16 @@ public class JoinWindow extends JFrame implements Capturable{
 	}
 	/* ドロップイベント */
 	private TransferHandler getDropFileHandler(){
-		return new TransferHandler() {
+		return new TransferHandler(){
 			@Override
 			@SuppressWarnings("unchecked")
 			public boolean importData(TransferSupport support){
 				// ドロップされていないかドロップされたものがファイルではない場合は受け取らない
 				if(!support.isDrop() && support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) return false;
 				// ドロップ処理、ファイルを受け取り順番に読み込んで追加する
-				try {
+				try{
 					((List<File>) support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor)).forEach(file->addImage(file));
-				}catch(Exception e) {
-					e.printStackTrace();
-				}
+				}catch(Exception e){}
 				return true;
 			}
 		};
@@ -113,16 +115,15 @@ public class JoinWindow extends JFrame implements Capturable{
 			MainWindow.putLog("位置：" + il.toString());		
 		});
 	}
-	public void addImage(File file) {
+	public void addImage(File file){
 		try {
 			addImage(ImageIO.read(file));
-		}catch(IOException error) {
-			error.printStackTrace();
-		}
+		}catch(IOException error){}
 	}
 	/* 画像を追加する(位置認識Ver) */
 	public void addImageX(BufferedImage image){
-		Optional.ofNullable(image).map(bimage->option.checkImageX(this, bimage)).ifPresent(il->{
+		Optional.ofNullable(image).filter(im->option.checkImageX(image) >= 0)
+		.map(im->(ImageLabel) getContentPane().getComponent(option.checkImageX(image))).ifPresent(il->{
 			// image != null && p >= 0 の際に実行される
 			MainWindow.putLog("【自動取得】");
 			il.setImage(image.getSubimage(option.getPositionX(), option.getPositionY(), size.width, size.height));
@@ -130,9 +131,7 @@ public class JoinWindow extends JFrame implements Capturable{
 		});	
 	}
 	/* 画像を保存する */
-	private boolean exclude(int arg, int ...excludes){
-		return !IntStream.of(excludes).anyMatch(exclude->exclude == arg);
-	}
+	private boolean exclude(int arg, int ...excludes){return !IntStream.of(excludes).anyMatch(exclude->exclude == arg);}
 	private void drawFrame(Graphics2D graphics, double x1, double y1, double x2, double y2){
 		graphics.draw(new Line2D.Double(x1 * size.width, y1 * size.height, x2 * size.width, y2 * size.height));
 	}

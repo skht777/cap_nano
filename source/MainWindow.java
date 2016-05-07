@@ -11,9 +11,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
-import java.util.function.IntUnaryOperator;
 import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -30,7 +30,7 @@ public class MainWindow extends JFrame implements Capturable{
 	// 変数
 	private JComboBox<Pair<FrameOption>> comboBox1;
 	private JComboBox<Pair<UnaryOperator<BufferedImage>>> comboBox2;
-	private JComboBox<Pair<IntUnaryOperator>> joinSortCombo; 
+	private JComboBox<SortType> joinSortCombo; 
 	private JComboBox<Pair<Dimension>> joinSizeCombo;
 	private JoinWindow unit, sort, visible;
 	public static JTextArea textArea;
@@ -53,6 +53,7 @@ public class MainWindow extends JFrame implements Capturable{
 		
 		comboBox1 = new JComboBox<>(new Vector<>(getModeList()));
 		comboBox1.addActionListener(event->{
+			reset();
 			switch(getSelectedItem(comboBox1).getValue()){
 				default:
 //					if(option.getFPS() != 0){
@@ -63,7 +64,6 @@ public class MainWindow extends JFrame implements Capturable{
 //					}
 					break;
 				case UNIT:
-					comboBox2.setEnabled(false);
 //					if(option.isAuto()){
 //						timer.restart();
 //						timer.setDelay(500);
@@ -73,7 +73,6 @@ public class MainWindow extends JFrame implements Capturable{
 					visible = unit;
 					break;
 				case SORT:
-					comboBox2.setEnabled(false);
 					//timer.setDelay(1000 * 60 * 60 * 24);
 					visible = sort;
 					break;
@@ -122,9 +121,6 @@ public class MainWindow extends JFrame implements Capturable{
 		panel.add(joinSizeCombo);
 		panel.add(button4);
 		
-		joinSortCombo.setEnabled(false);
-		joinSizeCombo.setEnabled(false);
-		
 		getContentPane().add(panel, BorderLayout.NORTH);
 		getContentPane().add(new JScrollPane(textArea), BorderLayout.SOUTH);
 		pack();
@@ -145,57 +141,50 @@ public class MainWindow extends JFrame implements Capturable{
 	}
 	private <T> T getSelectedItem(JComboBox<T> comboBox){return comboBox.getModel().getElementAt(comboBox.getSelectedIndex());}
 	/* テキストエリアにテキストを追加する */
-	public static void putLog(String message){
-		textArea.append(message + "\n");
-	}
+	public static void putLog(String message){textArea.append(message + "\n");}
 	/* 名前隠し機能 */
-	private void colorRect(Graphics graphics, int x, int y, int width, int height, int r, int g, int b){
+	private void colorRect(Graphics graphics, int x, int y, int w, int h, int r, int g, int b){
 		graphics.setColor(new Color(r, g, b));
-		graphics.fillRect(x, y, width, height);
+		graphics.fillRect(x, y, w, h);
 	}
 	private void disableName(BufferedImage image){
 		Graphics graphics = image.getGraphics();
 		// 母港左上の提督名
-		if(checkHome(image)){
+		if(checkHome(image))
 			colorRect(graphics, 111, 0, 162, 25, 38, 38, 38);
-		}
 		// 艦隊司令部情報
-		if(Capturable.checkColor(image, 306,276,84,84,84) &&
-				Capturable.checkColor(image, 251,203,35,158,159) &&
-				Capturable.checkColor(image, 272,479,159,155,61)){
+		if(Scan.check(image, Scan.INFO1, Scan.INFO2, Scan.INFO3))
 			colorRect(graphics, 201, 123, 295, 30, 241, 234, 221);
-		}
 		// ランキング
-		if(Capturable.checkColor(image, 87, 189, 79, 152, 139) &&
-				Capturable.checkColor(image, 158, 81, 196, 169, 87) &&
-				Capturable.checkColor(image, 47, 333, 115, 166, 202)){
+		if(Scan.check(image, Scan.RANK1, Scan.RANK2, Scan.RANK3))
 			colorRect(graphics, 225, 153, 150, 298, 54, 54, 54);
-		}
 		// 演習一覧
-		if(Capturable.checkColor(image, 140, 131, 103, 83, 46) &&
-				Capturable.checkColor(image, 654,119,255,191,96) &&
-				Capturable.checkColor(image, 654,119,255,191,96)){
+		if(Scan.check(image, Scan.PLIST1, Scan.PLIST2)){
 			IntStream.of(1, 3, 5).forEach(i->colorRect(graphics, 338, 178 + 55 * i, 165, 14, 225, 209, 181));
 			IntStream.of(2, 4).forEach(i->colorRect(graphics, 338, 178 + 55 * i, 165, 14, 237, 223, 207));
 		}
 		// 演習個別
-		if(Capturable.checkColor(image, 0,0,0,0,0) && 
-				Capturable.checkColor(image, 168,165,17,156,160) &&
-				Capturable.checkColor(image, 635,444,224,217,204)){
+		if(Scan.check(image, Scan.PINVI1, Scan.PINVI2, Scan.PINVI1))
 			colorRect(graphics, 130, 87, 295, 30, 246, 239, 228);
-		}
 		// 戦果報告
-		if(Capturable.checkColor(image, 51,77,255,246,242) &&
-				Capturable.checkColor(image, 395,289,255,246,242) &&
-				Capturable.checkColor(image, 0,0,36,54,63)){
+		if(Scan.check(image, Scan.RESULT1, Scan.RESULT2, Scan.RESULT3))
 			colorRect(graphics, 56, 82, 172, 24, 37, 44, 47);
-		}
 		graphics.dispose();
 	}
 	// FIXME: OSやブラウザによる色の違いへの対処が求められる
 	private boolean checkHome(BufferedImage image){
 		return true;
-		//return Capturable.checkColor(image, 665, 42, 83, 159, 73) && Capturable.checkColor(image, 736, 61, 172, 128, 95);
+		//return Scan.check(image, Scan.HOME1, Scan.HOME2);
+	}
+	private void reset(){
+		Optional.ofNullable(visible).ifPresent(window->window.setVisible(false));
+		visible = null;
+		comboBox2.setEnabled(true);
+		Stream.of(joinSortCombo, joinSizeCombo).forEach(comboBox->{
+			comboBox.setModel(null);
+			comboBox.setEditable(false);
+		});
+		
 	}
 	/* 画像保存 */
 	@Override
@@ -204,18 +193,16 @@ public class MainWindow extends JFrame implements Capturable{
 		Optional.ofNullable(Capture.getImage())
 		.ifPresent(image->Capturable.savePicture(getSelectedItem(comboBox2).getValue().apply(image)));
 	}
-	private List<BasicPair<FrameOption>> getModeList(){
-		return Arrays.asList(new BasicPair<>("通常", null), new BasicPair<>("改装", FrameOption.UNIT), new BasicPair<>("ソート", FrameOption.SORT));
+	private List<Pair<FrameOption>> getModeList(){
+		return Arrays.asList(new Pair<>("通常", null), new Pair<>("改装", FrameOption.UNIT), new Pair<>("ソート", FrameOption.SORT));
 	}
-	private List<BasicPair<UnaryOperator<BufferedImage>>> getSaveTypeList(){
-		return Arrays.asList(new BasicPair<UnaryOperator<BufferedImage>>("通常", image->{
+	private List<Pair<UnaryOperator<BufferedImage>>> getSaveTypeList(){
+		return Arrays.asList(new Pair<UnaryOperator<BufferedImage>>("通常", image->{
 			if(option.disableName()) disableName(image);
 			return image;
-		}), new BasicPair<UnaryOperator<BufferedImage>>("編成", image->{
-			if(Capturable.checkColor(image, 420,118,195,180,169) && 
-					Capturable.checkColor(image, 506,114,115,180,191)) return image.getSubimage(100, 94, 700, 386);
-			return null;
-		}), new BasicPair<UnaryOperator<BufferedImage>>("資材", image->{
+		}), new Pair<UnaryOperator<BufferedImage>>("編成", image->
+			Scan.check(image, Scan.TEAM1, Scan.TEAM2) ? image.getSubimage(100, 94, 700, 386) : null
+		), new Pair<UnaryOperator<BufferedImage>>("資材", image->{
 			BufferedImage supplyImage = new BufferedImage(229, 60, BufferedImage.TYPE_INT_BGR);
 			Graphics graphics = supplyImage.getGraphics();
 			graphics.drawImage(image.getSubimage(9, 407, 86, 60), 0, 0, null);		//時刻

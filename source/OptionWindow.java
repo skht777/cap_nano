@@ -2,9 +2,6 @@
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Vector;
 import java.awt.event.ActionEvent;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -15,7 +12,7 @@ public class OptionWindow extends JFrame implements ActionListener{
 	/* メンバ変数 */
 	// 変数
 	private JCheckBox checkbox1, checkbox2, checkbox3;
-	private JComboBox<Pair<Integer>> comboBox;
+	private JComboBox<FPS> comboBox;
 	/* コンストラクタ */
 	OptionWindow(OptionData option){
 		// ウィンドウの設定
@@ -37,7 +34,7 @@ public class OptionWindow extends JFrame implements ActionListener{
 		checkbox3.addActionListener(this);
 		checkbox3.setActionCommand("名前隠し");
 		
-		comboBox = new JComboBox<>(new Vector<>(option.getFPSList()));
+		comboBox = new JComboBox<>(FPS.values());
 		comboBox.addActionListener(option.getFPSAction());
 		
 		// オブジェクトの配置

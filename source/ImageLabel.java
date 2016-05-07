@@ -20,20 +20,16 @@ class ImageLabel extends JLabel{
 		RED(new LineBorder(Color.RED, 4)),
 		BLUE(new LineBorder(Color.BLUE, 4));
 		private Border border;
-		private LINE(Border border) {
-			this.border = border;
-		}
-		void set(JComponent ...targets) {
-			Arrays.stream(targets).forEach(target->target.setBorder(border));
-		}
+		private LINE(Border border){this.border = border;}
+		private void set(JComponent ...targets){Arrays.stream(targets).forEach(target->target.setBorder(border));}
 	}
-	public ImageLabel() {
+	public ImageLabel(){
 		super();
 		// 枠線を描画する
 		LINE.NORMAL.set(this);
 		addMouseListener(getMouseListener());
 	}
-	public static void swapImage(ImageLabel il1, ImageLabel il2) {
+	static void swapImage(ImageLabel il1, ImageLabel il2) {
 		Image temp = il1.getImage();
 		il1.setImage(il2.getImage());
 		il2.setImage(temp);
@@ -42,30 +38,18 @@ class ImageLabel extends JLabel{
 		Optional.of(event).filter(e->e.getButton() > 0).map(e->(JComponent) e.getSource())
 		.filter(target->!LINE.RED.border.equals(target.getBorder())).ifPresent(target->line.set(target));
 	}
-	public int getIndexX() {
-		return getX() / getWidth();
-	}
-	public int getIndexY() {
-		return getY() / getHeight();
-	}
-	public Image getImage() {
-		return image;
-	}
+	public int getIndexX(){return getX() / getWidth();}
+	public int getIndexY(){return getY() / getHeight();}
+	public Image getImage(){return image;}
 	public void setImage(Image image) {
 		this.image = image;
 		setIcon(image == null ? null : new ImageIcon(this.image
 				.getScaledInstance(getWidth(), getHeight(), Image.SCALE_AREA_AVERAGING)));
 	}
-	public void clearImage() {
-		setImage(null);
-	}
-	public boolean hasImage(){
-		return getIcon() != null;
-	}
+	public void clearImage(){setImage(null);}
+	public boolean hasImage(){return getIcon() != null;}
 	@Override
-	public String toString() {
-		return String.format("(%d,%d)", getIndexX(), getIndexY());
-	}
+	public String toString(){return String.format("(%d,%d)", getIndexX(), getIndexY());}
 	/* マウスイベント */
 	private MouseAdapter getMouseListener(){
 		return new MouseAdapter(){
