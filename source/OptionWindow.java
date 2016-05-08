@@ -1,8 +1,9 @@
 /* オプションウィンドウ */
 
 import java.awt.FlowLayout;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -78,15 +79,15 @@ public class OptionWindow extends JFrame implements ActionListener{
 		if(commandStr.equals("fps変更")){
 			fps = FPS_INT[comboBox.getSelectedIndex()];
 			if(fps != 0){
-				MainWindow.putLog("【連射機能】");
-				MainWindow.putLog("fps：" + fps + "fps");
+				LogManager.getLogger().appendLog("【連射機能】");
+				LogManager.getLogger().appendLog("fps：" + fps + "fps");
 				if(MainWindow.comboBox1.getSelectedIndex() == 0){
 					MainWindow.timer.restart();
 					MainWindow.timer.setDelay(1000 / fps);
 				}
 			}else{
-				MainWindow.putLog("【連射機能】");
-				MainWindow.putLog("fps：OFF");
+				LogManager.getLogger().appendLog("【連射機能】");
+				LogManager.getLogger().appendLog("fps：OFF");
 				if(MainWindow.comboBox1.getSelectedIndex() == 0){
 					MainWindow.timer.setDelay(1000 * 60 * 60 * 24);
 				}

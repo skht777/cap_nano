@@ -22,9 +22,9 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -33,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -106,7 +107,7 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 		if (event.getClickCount() < 2) return;
 		int deletePosition = getPosition(event);
 		if(ssBufferFlag.get(deletePosition) == false) return;
-		MainWindow.putLog("【画像削除】");
+		LogManager.getLogger().appendLog("【画像削除】");
 			// showImage(画面表示)上での削除
 			int x = deletePosition % getBlocksX(), y = deletePosition / getBlocksX();
 			Graphics graphics = showImage.getGraphics();
@@ -117,7 +118,7 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 			ssBuffer.set(deletePosition, clone(blankImage));
 			// フラグの削除
 			ssBufferFlag.set(deletePosition, false);
-		MainWindow.putLog("追加位置：(" + x+  "," + y + ")");
+		LogManager.getLogger().appendLog("追加位置：(" + x+  "," + y + ")");
 		panel.repaint();
 	}
 	public void mousePressed(MouseEvent event){
@@ -137,7 +138,7 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 		if(pressFlag == false) return;
 		int releasePosition = getPosition(event);
 		if(pressPosition != releasePosition){
-			MainWindow.putLog("【画像交換】");
+			LogManager.getLogger().appendLog("【画像交換】");
 				// showImage(画面表示)上での交換
 				int x1 =   pressPosition % getBlocksX(), y1 =   pressPosition / getBlocksX();
 				int x2 = releasePosition % getBlocksX(), y2 = releasePosition / getBlocksX();
@@ -155,7 +156,7 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 				boolean flag = ssBufferFlag.get(pressPosition);
 				ssBufferFlag.set(pressPosition, ssBufferFlag.get(releasePosition));
 				ssBufferFlag.set(releasePosition, flag);
-			MainWindow.putLog("(" + x2 + "," + y2 + ")⇔(" + x1 + "," + y1 + ")");
+			LogManager.getLogger().appendLog("(" + x2 + "," + y2 + ")⇔(" + x1 + "," + y1 + ")");
 		}
 		pressFlag = false;
 		panel.repaint();
@@ -218,7 +219,7 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 		for(int i = 0; i < blocksSize; i++){
 			int p = getIndex(i);
 			if(ssBufferFlag.get(p) == false){
-				MainWindow.putLog("【画像追加】");
+				LogManager.getLogger().appendLog("【画像追加】");
 					ssBuffer.set(p, image);
 					ssBufferFlag.set(p, true);
 					int px = p % getBlocksX(), py = p / getBlocksX();
@@ -227,7 +228,7 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 					graphics.drawImage(temp.getScaledInstance(getBlockSizeX_(), getBlockSizeY_(), Image.SCALE_AREA_AVERAGING), getSX_(px), getSY_(py), this);
 					graphics.dispose();
 					panel.repaint();
-				MainWindow.putLog("位置：(" + px + "," + py + ")");
+				LogManager.getLogger().appendLog("位置：(" + px + "," + py + ")");
 				return;
 			}
 		}
@@ -238,7 +239,7 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 		int position = checkImageX(image);
 		if(position < 0) return;
 		position = getIndex(position);
-		MainWindow.putLog("【自動取得】");
+		LogManager.getLogger().appendLog("【自動取得】");
 			ssBuffer.set(position, image);
 			ssBufferFlag.set(position, true);
 			int px = position % getBlocksX(), py = position / getBlocksX();
@@ -247,7 +248,7 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 			graphics.drawImage(temp.getScaledInstance(getBlockSizeX_(), getBlockSizeY_(), Image.SCALE_AREA_AVERAGING), getSX_(px), getSY_(py), this);
 			graphics.dispose();
 			panel.repaint();
-		MainWindow.putLog("位置：(" + px + "," + py + ")");
+		LogManager.getLogger().appendLog("位置：(" + px + "," + py + ")");
 	}
 	/* 画像を保存する */
 	abstract void addSpecialFrame(BufferedImage image, int px1, int py1, int px2, int py2);
@@ -266,7 +267,7 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 		}
 		if(px2 - px1 < 0) return;
 		// 保存用バッファに画像を配置する
-		MainWindow.putLog("【画像保存】");
+		LogManager.getLogger().appendLog("【画像保存】");
 		BufferedImage saveBuffer = new BufferedImage(getSX(getBlocksX()), getSY(getBlocksY()), BufferedImage.TYPE_INT_BGR);
 		Graphics graphics = saveBuffer.getGraphics();
 		for(int x = 0; x < getBlocksX(); x++){
@@ -284,7 +285,7 @@ abstract class JoinWindow extends JFrame implements MouseListener, KeyListener, 
 		String saveName = DATE_FORMAT.format(Calendar.getInstance().getTime()) + ".png";
 		try{
 			ImageIO.write(saveBuffer.getSubimage(px1 * getBlockSizeX(), py1 * getBlockSizeY(), (px2 - px1 + 1) * getBlockSizeX(), (py2 - py1 + 1) * getBlockSizeY()), "png", new File(saveName));
-			MainWindow.putLog(saveName);
+			LogManager.getLogger().appendLog(saveName);
 			int option = JOptionPane.showConfirmDialog(this, "画像をクリアしますか？", "記録は大切なの", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 			if(option == JOptionPane.YES_OPTION){
 				// showImageの削除

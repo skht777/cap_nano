@@ -4,13 +4,14 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
 import javax.imageio.ImageIO;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -87,6 +88,8 @@ public class MainWindow extends JFrame implements ActionListener{
 		textArea = new JTextArea();
 		textArea.setRows(4);
 		textArea.setEditable(false);
+		// ロガーのセット
+		LogManager.setLogger(message -> textArea.append(message+"\n"));
 		
 		// オブジェクトの配置
 		getContentPane().setLayout(new BorderLayout(10, 10));
@@ -247,10 +250,7 @@ public class MainWindow extends JFrame implements ActionListener{
 			break;
 		}
 	}
-	/* テキストエリアにテキストを追加する */
-	public static void putLog(String message){
-		textArea.append(message + "¥n");
-	}
+	
 	/* 名前隠し機能 */
 	private static void disableName(BufferedImage image){
 		Graphics graphics = image.getGraphics();
@@ -328,13 +328,13 @@ public class MainWindow extends JFrame implements ActionListener{
 			switch((String)comboBox2.getSelectedItem()){
 			case "通常":
 				if(OptionWindow.checkbox3.isSelected()) disableName(flashImage);
-				putLog("【画像保存】");
+				LogManager.getLogger().appendLog("【画像保存】");
 				ImageIO.write(flashImage, "png", new File(saveName));
 				break;
 			case "編成":
 				if(!JoinWindow.checkColor(flashImage, 420,118,195,180,169)) return;
 				if(!JoinWindow.checkColor(flashImage, 506,114,115,180,191)) return;
-				putLog("【画像保存】");
+				LogManager.getLogger().appendLog("【画像保存】");
 				ImageIO.write(flashImage.getSubimage(100, 94, 700, 386), "png", new File(saveName));
 				break;
 			case "資材":
@@ -343,11 +343,11 @@ public class MainWindow extends JFrame implements ActionListener{
 				graphics.drawImage(flashImage.getSubimage(9, 407, 86, 60), 0, 0, null);	//時刻
 				graphics.drawImage(flashImage.getSubimage(657, 9, 143, 60), 86, 0, null);	//資材
 				graphics.dispose();
-				putLog("【画像保存】");
+				LogManager.getLogger().appendLog("【画像保存】");
 				ImageIO.write(supplyImage, "png", new File(saveName));
 				break;
 			}
-			putLog(saveName);
+			LogManager.getLogger().appendLog(saveName);
 		}
 		catch(Exception error){
 			error.printStackTrace();
