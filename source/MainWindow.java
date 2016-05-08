@@ -33,7 +33,7 @@ public class MainWindow extends JFrame implements Capturable{
 	private JComboBox<SortType> joinSortCombo; 
 	private JComboBox<Pair<Dimension>> joinSizeCombo;
 	private JoinWindow unit, sort, visible;
-	public static JTextArea textArea;
+	private JTextArea textArea;
 	private Timer timer;
 	private OptionData option;
 	/* コンストラクタ */
@@ -107,6 +107,8 @@ public class MainWindow extends JFrame implements Capturable{
 		textArea = new JTextArea();
 		textArea.setRows(4);
 		textArea.setEditable(false);
+		// ロガーのセット
+		LogManager.setLogger(message -> textArea.append(message+"\n"));
 		
 		// オブジェクトの配置
 		getContentPane().setLayout(new BorderLayout(10, 10));
@@ -140,8 +142,6 @@ public class MainWindow extends JFrame implements Capturable{
 		//timer.start();
 	}
 	private <T> T getSelectedItem(JComboBox<T> comboBox){return comboBox.getModel().getElementAt(comboBox.getSelectedIndex());}
-	/* テキストエリアにテキストを追加する */
-	public static void putLog(String message){textArea.append(message + "\n");}
 	/* 名前隠し機能 */
 	private void colorRect(Graphics graphics, int x, int y, int w, int h, int r, int g, int b){
 		graphics.setColor(new Color(r, g, b));

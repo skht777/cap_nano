@@ -57,9 +57,9 @@ class ImageLabel extends JLabel{
 			public void mouseClicked(MouseEvent event){
 				// ダブルクリックした際は、その場所の記録画像を消去する
 				Optional.of(event).filter(e->e.getClickCount() >= 2).map(e->(ImageLabel) e.getSource()).filter(ImageLabel::hasImage).ifPresent(il->{
-					MainWindow.putLog("【画像削除】");
+					LogManager.getLogger().appendLog("【画像削除】");
 					il.clearImage();
-					MainWindow.putLog("追加位置：" +  il.toString());
+					LogManager.getLogger().appendLog("追加位置：" +  il.toString());
 				});
 			}
 			@Override
@@ -73,10 +73,10 @@ class ImageLabel extends JLabel{
 				ImageLabel pressed = (ImageLabel) event.getSource();
 				ImageLabel released = (ImageLabel) pressed.getParent().getComponentAt(pressed.getX() + event.getX(), pressed.getY() + event.getY());
 				if(released != null && !pressed.equals(released)){
-					MainWindow.putLog("【画像交換】");
+					LogManager.getLogger().appendLog("【画像交換】");
 					// 画像を入れ替える
 					swapImage(pressed, released);
-					MainWindow.putLog(pressed.toString() + "⇔" + released.toString());
+					LogManager.getLogger().appendLog(pressed.toString() + "⇔" + released.toString());
 				}
 				LINE.NORMAL.set(pressed, released);
 			}

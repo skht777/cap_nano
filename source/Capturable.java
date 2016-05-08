@@ -16,8 +16,8 @@ public interface Capturable {
 			}catch(Exception error){
 				error.printStackTrace();
 			}
-			//putLog("【画像保存】");
-			//putLog(saveName);
+			LogManager.getLogger().appendLog("【画像保存】");
+			LogManager.getLogger().appendLog(saveName);
 		});
 	}
 	public void savePicture();

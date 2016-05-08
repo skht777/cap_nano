@@ -110,9 +110,9 @@ public class JoinWindow extends JFrame implements Capturable{
 	public void addImage(BufferedImage image){
 		if(image == null || !option.checkImage(image)) return;
 		Arrays.stream(getContentPane().getComponents()).map(c->(ImageLabel) c).filter(il->!il.hasImage()).findFirst().ifPresent(il->{
-			MainWindow.putLog("【画像追加】");
+			LogManager.getLogger().appendLog("【画像追加】");
 			il.setImage(image.getSubimage(option.getPositionX(), option.getPositionY(), size.width, size.height));
-			MainWindow.putLog("位置：" + il.toString());		
+			LogManager.getLogger().appendLog("位置：" + il.toString());		
 		});
 	}
 	public void addImage(File file){
@@ -125,9 +125,9 @@ public class JoinWindow extends JFrame implements Capturable{
 		Optional.ofNullable(image).filter(im->option.checkImageX(image) >= 0)
 		.map(im->(ImageLabel) getContentPane().getComponent(option.checkImageX(image))).ifPresent(il->{
 			// image != null && p >= 0 の際に実行される
-			MainWindow.putLog("【自動取得】");
+			LogManager.getLogger().appendLog("【自動取得】");
 			il.setImage(image.getSubimage(option.getPositionX(), option.getPositionY(), size.width, size.height));
-			MainWindow.putLog("位置：" + il.toString());
+			LogManager.getLogger().appendLog("位置：" + il.toString());
 		});	
 	}
 	/* 画像を保存する */

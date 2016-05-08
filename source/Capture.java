@@ -22,7 +22,7 @@ public class Capture{
 	/* 艦これの座標を取得する */
 	public static void getKancollePosition(){
 		displayIndex = -1;
-		MainWindow.putLog("【座標取得】");
+		LogManager.getLogger().appendLog("【座標取得】");
 		// 座標を取得する処理
 		// まず、全てのディスプレイにおけるスクショを取得する
 		List<BufferedImage> images = new ArrayList<>();
@@ -92,9 +92,9 @@ public class Capture{
 				n++;
 			}
 			if(displayIndex >= 0){
-				MainWindow.putLog("ディスプレイ番号-左上座標：" + displayIndex + "-" + flashPX + "," + flashPY);
+			  LogManager.getLogger().appendLog("ディスプレイ番号-左上座標：" + displayIndex + "-" + flashPX + "," + flashPY);
 			}else{
-				MainWindow.putLog("艦これの画面を取得できませんでした。");
+			  LogManager.getLogger().appendLog("艦これの画面を取得できませんでした。");
 			}
 		}
 		catch(Exception error){
