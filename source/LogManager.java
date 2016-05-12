@@ -1,30 +1,18 @@
+import java.util.Optional;
 
-
-
-public class LogManager {
+public class LogManager{
 	private static Logger logger;
-
 	/**
 	 * デバッグ用
 	 */
 	@Deprecated
-	private static void initLogger() {
-		logger = (message) -> {
-			System.out.println(message);
-		};
-	}
-
-	public static Logger getLogger() {
-		if (logger == null)
-			initLogger();
+	private static Logger initLogger(){
+		setLogger(System.out::println);
 		return logger;
 	}
-
-	public static void setLogger(Logger newLogger) {
-		logger = newLogger;
-	}
-
-	interface Logger {
+	public static Logger getLogger(){return Optional.of(logger).orElse(initLogger());}
+	public static void setLogger(Logger newLogger){logger = newLogger;}
+	public interface Logger{
 		public void appendLog(String message);
 	}
 }

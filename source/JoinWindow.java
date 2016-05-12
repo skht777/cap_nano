@@ -9,10 +9,12 @@
  * 30 31 32 33 34 35
  */
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.RenderingHints;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.KeyAdapter;
@@ -24,7 +26,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -37,10 +38,9 @@ import javax.swing.TransferHandler;
 public class JoinWindow extends JFrame implements Capturable{
 	/* メンバ変数 */
 	// 変数
-	private IntUnaryOperator sort;	// 表示方向(行優先・列優先・艦隊優先)
-	private Dimension size;			// 表示種類(コンパクト・通常・エクストラ)
+	private SortType sort;		// 表示方向(行優先・列優先・艦隊優先)
+	private SizeType size;		// 表示種類(コンパクト・通常・エクストラ)
 	private FrameOption option;
-	private String sortName = "", sizeName = "";
 	/* コンストラクタ */
 	JoinWindow(FrameOption option){
 		this.option = option;
@@ -50,33 +50,28 @@ public class JoinWindow extends JFrame implements Capturable{
 		setAlwaysOnTop(true);
 		addKeyListener(getKeyListener());
 		setTransferHandler(getDropFileHandler());
-		// ウィンドウにおける設定
-		setSizeType(option.getSizeList().get(0));
-		setSortType(option.getSortList().get(0));
 		// オブジェクトにおける設定
-		getContentPane().setLayout(option.getBlocks());
+		getContentPane().setLayout(new GridLayout(option.getRow(), option.getColumn()));
 		getContentPane().setBackground(Color.WHITE);
 		
 		IntStream.range(0, option.getRow() * option.getColumn()).forEach(i->getContentPane().add(new ImageLabel()));
 	}
 	/* アクセッサ */
-	public int getIndex(int i){return sort.applyAsInt(i);}
+	public int getIndex(int i){return sort.getMethod(option).applyAsInt(i);}
 	public void setSortType(SortType type){
-		sortName = type.toString();
-		sort = type.getMethod(option);
+		sort = type;
 		IntStream.range(0, getContentPane().getComponentCount()).forEach(i->
 		ImageLabel.swapImage((ImageLabel) getContentPane().getComponent(i), (ImageLabel) getContentPane().getComponent(getIndex(i))));
 		redraw();
 	}
-	public void setSizeType(Pair<Dimension> type){
-		sizeName = type.toString();
-		size = type.getValue();
-		if(!type.getValue().equals(getPreferredSize())) setPreferredSize(option.getWindowSize(type.getValue()));
+	public void setSizeType(SizeType type){
+		size = type;
+		if(!size.equals(type)) setPreferredSize(new Dimension(option.getZoomed(size.getWidth()) * option.getRow(), option.getZoomed(size.getHeight() * option.getColumn())));
 		redraw();
 	}
 	/* 表示を更新する */
 	private void redraw(){
-		setTitle(String.format("%s一覧-%s-%s", option.toString(), sortName, sizeName));
+		setTitle(String.format("%s一覧-%s-%s", option.toString(), sort.toString(), size.toString()));
 		pack();
 		validate();
 	}
@@ -111,7 +106,7 @@ public class JoinWindow extends JFrame implements Capturable{
 		if(image == null || !option.checkImage(image)) return;
 		Arrays.stream(getContentPane().getComponents()).map(c->(ImageLabel) c).filter(il->!il.hasImage()).findFirst().ifPresent(il->{
 			LogManager.getLogger().appendLog("【画像追加】");
-			il.setImage(image.getSubimage(option.getPositionX(), option.getPositionY(), size.width, size.height));
+			il.setImage(image.getSubimage(option.getPositionX(), option.getPositionY(), size.getWidth(), size.getHeight()));
 			LogManager.getLogger().appendLog("位置：" + il.toString());		
 		});
 	}
@@ -125,29 +120,29 @@ public class JoinWindow extends JFrame implements Capturable{
 		Optional.ofNullable(image).filter(im->option.checkImageX(image) >= 0)
 		.map(im->(ImageLabel) getContentPane().getComponent(option.checkImageX(image))).ifPresent(il->{
 			// image != null && p >= 0 の際に実行される
+			il.setImage(image.getSubimage(option.getPositionX(), option.getPositionY(), size.getWidth(), size.getHeight()));
 			LogManager.getLogger().appendLog("【自動取得】");
-			il.setImage(image.getSubimage(option.getPositionX(), option.getPositionY(), size.width, size.height));
 			LogManager.getLogger().appendLog("位置：" + il.toString());
 		});	
 	}
 	/* 画像を保存する */
 	private boolean exclude(int arg, int ...excludes){return !IntStream.of(excludes).anyMatch(exclude->exclude == arg);}
 	private void drawFrame(Graphics2D graphics, double x1, double y1, double x2, double y2){
-		graphics.draw(new Line2D.Double(x1 * size.width, y1 * size.height, x2 * size.width, y2 * size.height));
+		graphics.draw(new Line2D.Double(x1 * size.getWidth(), y1 * size.getHeight(), x2 * size.getWidth(), y2 * size.getHeight()));
 	}
 	private void addSpecialFrame(Graphics2D graphics, int px1, int py1, int px2, int py2){
-		graphics.setStroke(option.getStroke());
+		graphics.setStroke(new BasicStroke(option.getStroke()));
 		graphics.setPaint(Color.BLUE);
-		switch(sort.toString()){
-			case "行を優先":
+		switch(sort){
+			case ROW:
 				IntStream.range(1, option.getColumn()).filter(y->exclude(y, py1, py2 + 1)).forEach(y->IntStream.range(0, option.getRow())
 						.forEach(x->drawFrame(graphics, x, y, x + 1, y)));
 				break;
-			case "列を優先":
+			case COLUMN:
 				IntStream.range(1, option.getRow()).filter(x->exclude(x, py1, py2 + 1)).forEach(x->IntStream.range(0, option.getRow())
 						.forEach(y->drawFrame(graphics, x, y, x, y + 1)));
 				break;
-			case "艦隊優先":
+			case TEAM:
 				IntStream.range(0, option.getRow()).filter(x->exclude(3, py1, py2 + 1)).forEach(x->drawFrame(graphics, x, 3, x + 1, 3));
 				IntStream.range(0, option.getColumn()).filter(x->exclude(2, py1, py2 + 1)).forEach(x->drawFrame(graphics, 2, 0, 2, option.getColumn()));
 				IntStream.range(0, option.getColumn()).filter(x->exclude(2, py1, py2 + 1)).forEach(x->drawFrame(graphics, 4, 0, 4, option.getColumn()));
@@ -159,9 +154,9 @@ public class JoinWindow extends JFrame implements Capturable{
 			IntStream.range(0, option.getColumn()).forEach(y->IntStream.range(0, option.getRow()).forEach(x->{
 				int px = getIndex(y * option.getColumn() + x) % option.getRow(), py = getIndex(y * option.getColumn() + x) / option.getRow();
 				graphics.setPaint(Color.WHITE);
-				graphics.drawString(String.format("%d-%d", y + 1, x + 1), (px + 1) * size.width - 70, py * size.height + 40);
+				graphics.drawString(String.format("%d-%d", y + 1, x + 1), (px + 1) * size.getWidth() - 70, py * size.getHeight() + 40);
 				graphics.setPaint(Color.RED);
-				graphics.drawString(String.format("%d-%d", y + 1, x + 1), (px + 1) * size.width - 72, py * size.height + 38);
+				graphics.drawString(String.format("%d-%d", y + 1, x + 1), (px + 1) * size.getWidth() - 72, py * size.getHeight() + 38);
 			}));
 		}
 	}
@@ -180,7 +175,7 @@ public class JoinWindow extends JFrame implements Capturable{
 		Graphics2D graphics = saveBuffer.createGraphics();
 		list.forEach(il->graphics.drawImage(il.getImage(), option.getZoomed(il.getX()), option.getZoomed(il.getY()), this));
 		// 特殊な枠線を追加する
-		//if(addFrame)
+		if(OptionData.getData().drawFrame())
 			addSpecialFrame(graphics, min.getIndexX(), min.getIndexY(), max.getIndexX(), max.getIndexY());
 		graphics.dispose();
 		Capturable.savePicture(saveBuffer.getSubimage(option.getZoomed(min.getX()), option.getZoomed(min.getY()),

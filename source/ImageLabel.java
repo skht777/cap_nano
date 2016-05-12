@@ -29,12 +29,12 @@ class ImageLabel extends JLabel{
 		LINE.NORMAL.set(this);
 		addMouseListener(getMouseListener());
 	}
-	static void swapImage(ImageLabel il1, ImageLabel il2) {
+	static void swapImage(ImageLabel il1, ImageLabel il2){
 		Image temp = il1.getImage();
 		il1.setImage(il2.getImage());
 		il2.setImage(temp);
 	}
-	private static void changeColor(MouseEvent event, ImageLabel.LINE line) {
+	private static void changeColor(MouseEvent event, ImageLabel.LINE line){
 		Optional.of(event).filter(e->e.getButton() > 0).map(e->(JComponent) e.getSource())
 		.filter(target->!LINE.RED.border.equals(target.getBorder())).ifPresent(target->line.set(target));
 	}

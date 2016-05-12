@@ -6,8 +6,8 @@ import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
-public interface Capturable {
-	static void savePicture(BufferedImage image) {
+public interface Capturable{
+	static void savePicture(BufferedImage image){
 		// 画像の保存処理
 		Optional.ofNullable(image).ifPresent(im->{
 			String saveName = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss-SSS").format(Calendar.getInstance().getTime()) + ".png";

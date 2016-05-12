@@ -12,7 +12,9 @@ public enum FPS{
 		this.name = name;
 		this.value = value;
 	}
-	public int getValue(){return value;}
+	public int getDelay(){
+		return equals(DISABLE) ? 0 : 1000 / value;
+	}
 	@Override
 	public String toString(){return name;}
 }

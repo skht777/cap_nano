@@ -17,6 +17,6 @@
 public class Nano{
 	public static void main(String args[]){
 		// メイン画面
-		new MainWindow();
+		new MainWindow().setVisible(true);
 	}
 }
