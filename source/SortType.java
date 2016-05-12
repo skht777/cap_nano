@@ -13,7 +13,7 @@ public enum SortType{
 			5,  6,  11, 12, 17, 18,
 			19, 20, 25, 26, 31, 32, 
 			21, 22, 27, 28, 33, 34,
-			23, 24, 29, 30, 35, 36}[i]);
+			23, 24, 29, 30, 35, 36}[i] - 1);
 	private String name;
 	private ToIntBiFunction<Integer, FrameOption> method;
 	private SortType(String name, ToIntBiFunction<Integer, FrameOption> method){

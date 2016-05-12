@@ -42,8 +42,9 @@ public class JoinWindow extends JFrame implements Capturable{
 	private SizeType size;		// 表示種類(コンパクト・通常・エクストラ)
 	private FrameOption option;
 	/* コンストラクタ */
-	JoinWindow(FrameOption option){
+	JoinWindow(FrameOption option, SortType sort, SizeType size){
 		this.option = option;
+		this.sort = sort;
 		// ウィンドウ・オブジェクトの設定
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setResizable(false);
@@ -53,20 +54,22 @@ public class JoinWindow extends JFrame implements Capturable{
 		// オブジェクトにおける設定
 		getContentPane().setLayout(new GridLayout(option.getRow(), option.getColumn()));
 		getContentPane().setBackground(Color.WHITE);
-		
 		IntStream.range(0, option.getRow() * option.getColumn()).forEach(i->getContentPane().add(new ImageLabel()));
+		setSizeType(size);
 	}
 	/* アクセッサ */
 	public int getIndex(int i){return sort.getMethod(option).applyAsInt(i);}
 	public void setSortType(SortType type){
+		if(sort != null && sort.equals(type)) return;
 		sort = type;
 		IntStream.range(0, getContentPane().getComponentCount()).forEach(i->
 		ImageLabel.swapImage((ImageLabel) getContentPane().getComponent(i), (ImageLabel) getContentPane().getComponent(getIndex(i))));
 		redraw();
 	}
 	public void setSizeType(SizeType type){
+		if(size != null && size.equals(type)) return;
 		size = type;
-		if(!size.equals(type)) setPreferredSize(new Dimension(option.getZoomed(size.getWidth()) * option.getRow(), option.getZoomed(size.getHeight() * option.getColumn())));
+		setPreferredSize(new Dimension(option.packZoom(size.getWidth()) * option.getRow(), option.packZoom(size.getHeight() * option.getColumn())));
 		redraw();
 	}
 	/* 表示を更新する */
@@ -171,15 +174,15 @@ public class JoinWindow extends JFrame implements Capturable{
 				list.stream().mapToInt(ImageLabel::getY).max().getAsInt());
 		if(min.equals(max)) return;
 		// 保存用バッファに画像を配置する
-		BufferedImage saveBuffer = new BufferedImage(option.getZoomed(getWidth()), option.getZoomed(getHeight()), BufferedImage.TYPE_INT_BGR);
+		BufferedImage saveBuffer = new BufferedImage(option.unPackZoom(getWidth()), option.unPackZoom(getHeight()), BufferedImage.TYPE_INT_BGR);
 		Graphics2D graphics = saveBuffer.createGraphics();
-		list.forEach(il->graphics.drawImage(il.getImage(), option.getZoomed(il.getX()), option.getZoomed(il.getY()), this));
+		list.forEach(il->graphics.drawImage(il.getImage(), option.unPackZoom(il.getX()), option.unPackZoom(il.getY()), this));
 		// 特殊な枠線を追加する
 		if(OptionData.getData().drawFrame())
 			addSpecialFrame(graphics, min.getIndexX(), min.getIndexY(), max.getIndexX(), max.getIndexY());
 		graphics.dispose();
-		Capturable.savePicture(saveBuffer.getSubimage(option.getZoomed(min.getX()), option.getZoomed(min.getY()),
-				 option.getZoomed((max.getX() - min.getX())), option.getZoomed((max.getY() - min.getY()))));
+		Capturable.savePicture(saveBuffer.getSubimage(option.unPackZoom(min.getX()), option.unPackZoom(min.getY()),
+				 option.unPackZoom((max.getX() - min.getX())), option.unPackZoom((max.getY() - min.getY()))));
 		int option = JOptionPane.showConfirmDialog(this, "画像をクリアしますか？", "記録は大切なの", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 		if(option == JOptionPane.YES_OPTION)
 			Arrays.stream(getContentPane().getComponents()).map(c->(ImageLabel) c).forEach(ImageLabel::clearImage);

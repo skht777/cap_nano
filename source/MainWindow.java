@@ -63,7 +63,7 @@ public class MainWindow extends JFrame implements Capturable{
 				timer.restart();
 				timer.setDelay(fps.getDelay());
 			}
-		}));
+		}).setVisible(true));
 		button2.setEnabled(false);
 		textArea = new JTextArea();
 		textArea.setRows(4);
@@ -92,7 +92,7 @@ public class MainWindow extends JFrame implements Capturable{
 			if(ModeType.MAIN.equals(getItem(comboBox1)) && OptionData.getData().isAuto()) visible.addImageX(Capture.getImage());
 			else if(ModeType.UNIT.equals(getItem(comboBox1)) && !FPS.DISABLE.equals(OptionData.getData().getFPS())) savePicture();
 		});
-		timer.start();
+		reset();
 	}
 	private <T> T getItem(JComboBox<T> comboBox){return comboBox.getItemAt(comboBox.getSelectedIndex());}
 	private void reset(){
@@ -100,8 +100,8 @@ public class MainWindow extends JFrame implements Capturable{
 		visible = null;
 		comboBox2.setEnabled(true);
 		Stream.of(joinSortCombo, joinSizeCombo).forEach(comboBox->{
-			comboBox.setModel(null);
-			comboBox.setEditable(false);
+			comboBox.setModel(new DefaultComboBoxModel<>());
+			comboBox.setEnabled(false);
 		});
 		timer.restart();
 		timer.setDelay(OptionData.getData().getFPS().getDelay());
@@ -114,9 +114,7 @@ public class MainWindow extends JFrame implements Capturable{
 		joinSizeCombo.setEnabled(true);
 		joinSortCombo.setModel(new DefaultComboBoxModel<>(getItem(comboBox1).getSortList()));
 		joinSizeCombo.setModel(new DefaultComboBoxModel<>(getItem(comboBox1).getSizeList()));
-		visible = new JoinWindow(getItem(comboBox1).getOption());
-		visible.setSizeType(joinSizeCombo.getItemAt(0));
-		visible.setSortType(joinSortCombo.getItemAt(0));
+		visible = new JoinWindow(getItem(comboBox1).getOption(), joinSortCombo.getItemAt(0), joinSizeCombo.getItemAt(0));
 		visible.setVisible(true);
 	}
 	/* 画像保存 */

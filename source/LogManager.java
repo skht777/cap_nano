@@ -1,4 +1,3 @@
-import java.util.Optional;
 
 public class LogManager{
 	private static Logger logger;
@@ -10,7 +9,7 @@ public class LogManager{
 		setLogger(System.out::println);
 		return logger;
 	}
-	public static Logger getLogger(){return Optional.of(logger).orElse(initLogger());}
+	public static Logger getLogger(){return logger != null ? logger : initLogger();}
 	public static void setLogger(Logger newLogger){logger = newLogger;}
 	public interface Logger{
 		public void appendLog(String message);
