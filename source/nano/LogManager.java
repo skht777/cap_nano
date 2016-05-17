@@ -1,3 +1,4 @@
+package nano;
 
 public class LogManager{
 	private static Logger logger;

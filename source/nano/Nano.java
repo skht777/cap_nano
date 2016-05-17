@@ -1,3 +1,4 @@
+package nano;
 /* 記録は大切なの.jar Ver.1.2 */
 
 /* TODO:

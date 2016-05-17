@@ -1,8 +1,11 @@
+package nano;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
+
+import nano.option.OptionData;
 
 enum SaveType{
 	NORMAL("通常",image->{

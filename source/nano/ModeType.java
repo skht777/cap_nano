@@ -1,3 +1,8 @@
+package nano;
+
+import nano.frame.FrameOption;
+import nano.frame.SizeType;
+import nano.frame.SortType;
 
 public enum ModeType {
 	MAIN("通常"),

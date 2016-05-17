@@ -1,3 +1,4 @@
+package nano.image;
 /* 画像取得用 */
 
 import java.awt.GraphicsConfiguration;
@@ -7,6 +8,8 @@ import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+
+import nano.LogManager;
 
 public class Capture{
 	/* メンバ変数 */
@@ -18,7 +21,7 @@ public class Capture{
 	static final int WHITE = 0xffffff;
 	// 変数
 	static List<Integer> gdIndex, gcIndex;
-	static int displayIndex = -1, flashPX, flashPY;
+	public static int displayIndex = -1, flashPX, flashPY;
 	/* 艦これの座標を取得する */
 	public static void getKancollePosition(){
 		displayIndex = -1;

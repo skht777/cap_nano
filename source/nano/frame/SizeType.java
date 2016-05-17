@@ -1,3 +1,4 @@
+package nano.frame;
 
 public enum SizeType {
 	UNIT1("通常表示", 460, 365),

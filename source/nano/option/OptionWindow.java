@@ -1,3 +1,4 @@
+package nano.option;
 /* オプションウィンドウ */
 
 import java.awt.FlowLayout;
@@ -14,7 +15,7 @@ public class OptionWindow extends JFrame{
 	private JCheckBox checkbox1, checkbox2, checkbox3;
 	private JComboBox<FPS> comboBox;
 	/* コンストラクタ */
-	OptionWindow(Consumer<FPS> action){
+	public OptionWindow(Consumer<FPS> action){
 		// ウィンドウの設定
 		setTitle("オプション");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

@@ -1,4 +1,7 @@
+package nano.option;
 /**/
+
+import nano.LogManager;
 
 public class OptionData{
 	/* メンバ変数 */

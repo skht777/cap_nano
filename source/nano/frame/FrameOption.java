@@ -1,7 +1,10 @@
+package nano.frame;
 /**/
 
 import java.awt.image.BufferedImage;
 import java.util.function.ToIntFunction;
+
+import nano.Scan;
 
 public enum FrameOption{
 	UNIT("改装", 

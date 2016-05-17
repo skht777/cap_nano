@@ -1,3 +1,4 @@
+package nano.frame;
 /* 一覧ウィンドウ(抽象クラス) */
 
 /* getIndex()において、デフォルトの番号付けは次の通り。
@@ -35,6 +36,11 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.TransferHandler;
 
+import nano.LogManager;
+import nano.image.Capturable;
+import nano.image.Capture;
+import nano.option.OptionData;
+
 @SuppressWarnings("serial")
 public class JoinWindow extends JFrame implements Capturable{
 	/* メンバ変数 */
@@ -43,7 +49,7 @@ public class JoinWindow extends JFrame implements Capturable{
 	private SizeType size;		// 表示種類(コンパクト・通常・エクストラ)
 	private FrameOption option;
 	/* コンストラクタ */
-	JoinWindow(FrameOption option, SortType sort, SizeType size){
+	public JoinWindow(FrameOption option, SortType sort, SizeType size){
 		this.option = option;
 		this.sort = sort;
 		// ウィンドウ・オブジェクトの設定

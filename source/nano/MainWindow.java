@@ -1,3 +1,4 @@
+package nano;
 /* メインウィンドウ */
 
 import java.awt.BorderLayout;
@@ -14,6 +15,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.Timer;
+
+import nano.frame.JoinWindow;
+import nano.frame.SizeType;
+import nano.frame.SortType;
+import nano.image.Capturable;
+import nano.image.Capture;
+import nano.option.FPS;
+import nano.option.OptionData;
+import nano.option.OptionWindow;
 
 @SuppressWarnings("serial")
 public class MainWindow extends JFrame implements Capturable{

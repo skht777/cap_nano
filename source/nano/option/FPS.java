@@ -1,3 +1,4 @@
+package nano.option;
 
 public enum FPS{
 	DISABLE("無効", 0),
