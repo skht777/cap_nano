@@ -39,10 +39,9 @@ public enum FrameOption{
 	}
 	int getPositionX(){return positionX;}
 	int getPositionY() {return positionY;}
-	int getRow(){return blocksX;}
-	int getColumn(){return blocksY;}
+	int getRow(){return blocksY;}
+	int getColumn(){return blocksX;}
 	int packZoom(int size){return size / zooming;}
-	int unPackZoom(int size){return size * zooming;}
 	float getStroke(){return stroke;}
 	/* 画像判定 */
 	public boolean checkImage(BufferedImage image){return Scan.check(image, scans);}

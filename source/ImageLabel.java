@@ -1,7 +1,7 @@
 import java.awt.Color;
-import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -13,7 +13,7 @@ import javax.swing.border.LineBorder;
 
 @SuppressWarnings("serial")
 class ImageLabel extends JLabel{
-	private Image image;
+	private BufferedImage image;
 	// ウインドウの枠線
 	private enum LINE{
 		NORMAL(new LineBorder(Color.BLACK, 1)),
@@ -21,7 +21,7 @@ class ImageLabel extends JLabel{
 		BLUE(new LineBorder(Color.BLUE, 4));
 		private Border border;
 		private LINE(Border border){this.border = border;}
-		private void set(JComponent ...targets){Arrays.stream(targets).forEach(target->target.setBorder(border));}
+		private void set(JComponent ...cs){Arrays.stream(cs).forEach(c->c.setBorder(border));}
 	}
 	public ImageLabel(){
 		super();
@@ -30,26 +30,25 @@ class ImageLabel extends JLabel{
 		addMouseListener(getMouseListener());
 	}
 	static void swapImage(ImageLabel il1, ImageLabel il2){
-		Image temp = il1.getImage();
+		BufferedImage temp = il1.getImage();
 		il1.setImage(il2.getImage());
 		il2.setImage(temp);
 	}
 	private static void changeColor(MouseEvent event, ImageLabel.LINE line){
 		Optional.of(event).filter(e->e.getButton() > 0).map(e->(JComponent) e.getSource())
-		.filter(target->!LINE.RED.border.equals(target.getBorder())).ifPresent(target->line.set(target));
+		.filter(c->!LINE.RED.border.equals(c.getBorder())).ifPresent(c->line.set(c));
 	}
-	public int getIndexX(){return getX() / getWidth();}
-	public int getIndexY(){return getY() / getHeight();}
-	public Image getImage(){return image;}
-	public void setImage(Image image) {
+	public int getPX(){return getX() / getWidth();}
+	public int getPY(){return getY() / getHeight();}
+	public BufferedImage getImage(){return image;}
+	public void setImage(BufferedImage image){
 		this.image = image;
-		setIcon(image == null ? null : new ImageIcon(this.image
-				.getScaledInstance(getWidth(), getHeight(), Image.SCALE_AREA_AVERAGING)));
+		setIcon(Optional.ofNullable(image).map(im->new ImageIcon(im.getScaledInstance(getWidth(), getHeight(), BufferedImage.SCALE_AREA_AVERAGING))).orElse(null));
 	}
 	public void clearImage(){setImage(null);}
 	public boolean hasImage(){return getIcon() != null;}
 	@Override
-	public String toString(){return String.format("(%d,%d)", getIndexX(), getIndexY());}
+	public String toString(){return String.format("(%d,%d)", getPX(), getPY());}
 	/* マウスイベント */
 	private MouseAdapter getMouseListener(){
 		return new MouseAdapter(){
@@ -57,39 +56,33 @@ class ImageLabel extends JLabel{
 			public void mouseClicked(MouseEvent event){
 				// ダブルクリックした際は、その場所の記録画像を消去する
 				Optional.of(event).filter(e->e.getClickCount() >= 2).map(e->(ImageLabel) e.getSource()).filter(ImageLabel::hasImage).ifPresent(il->{
-					LogManager.getLogger().appendLog("【画像削除】");
 					il.clearImage();
-					LogManager.getLogger().appendLog("追加位置：" +  il.toString());
+					LogManager.getLogger().appendLog("【画像削除】");
+					LogManager.getLogger().appendLog("変更位置：" +  il.toString());
 				});
 			}
 			@Override
-			public void mousePressed(MouseEvent event){
-				// マウスを押した際は押した位置のラベルを変更する
-				LINE.RED.set((JComponent) event.getSource());
-			}
+			// マウスを押した際は押した位置のラベルを変更する
+			public void mousePressed(MouseEvent event){LINE.RED.set((JComponent) event.getSource());}
 			@Override
+			// マウスを離した際は、その位置のマスとの交換を行う
 			public void mouseReleased(MouseEvent event){
-				// マウスを離した際は、その位置のマスとの交換を行う
 				ImageLabel pressed = (ImageLabel) event.getSource();
 				ImageLabel released = (ImageLabel) pressed.getParent().getComponentAt(pressed.getX() + event.getX(), pressed.getY() + event.getY());
 				if(released != null && !pressed.equals(released)){
-					LogManager.getLogger().appendLog("【画像交換】");
 					// 画像を入れ替える
 					swapImage(pressed, released);
+					LogManager.getLogger().appendLog("【画像交換】");
 					LogManager.getLogger().appendLog(pressed.toString() + "⇔" + released.toString());
 				}
 				LINE.NORMAL.set(pressed, released);
 			}
 			@Override
-			public void mouseEntered(MouseEvent event){
-				// マウスがラベル上に重なった歳は、その位置のラベルを変更する
-				ImageLabel.changeColor(event, LINE.BLUE);
-			}
+			// マウスがラベル上に重なった際は、その位置のラベルを変更する
+			public void mouseEntered(MouseEvent event){ImageLabel.changeColor(event, LINE.BLUE);}
 			@Override
-			public void mouseExited(MouseEvent event){
-				// マウスがラベルから離れた際はその位置のラベルを元に戻す
-				ImageLabel.changeColor(event, LINE.NORMAL);
-			}
+			// マウスがラベルから離れた際は、その位置のラベルを元に戻す
+			public void mouseExited(MouseEvent event){ImageLabel.changeColor(event, LINE.NORMAL);}
 		};
 	}
 }

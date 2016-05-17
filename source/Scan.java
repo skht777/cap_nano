@@ -41,10 +41,10 @@ public enum Scan {
 	// FIXME: OSやブラウザによる色の違いへの対処が求められる
 	private boolean checkColor(BufferedImage image, int x, int y, int r, int g, int b){
 		Color color = new Color(image.getRGB(x, y));
-		int diffR = color.getRed() - r, diffG = color.getGreen() - g, diffB = color.getBlue() - b;
-		int diff = diffR * diffR + diffG * diffG + diffB * diffB;
-		return true;
-//		return diff < 500 ? true : false;
+		Color diff = new Color(color.getRed() - r, color.getGreen() - g, color.getBlue() - b);
+		System.out.println(diff);
+//		return true;
+		return Math.pow(diff.getRed(), 2) + Math.pow(diff.getGreen(), 2) + Math.pow(diff.getBlue(), 2) < 500;
 	}
 	public int check(BufferedImage image, int n, int dx, int dy){
 		return IntStream.range(0, n).filter(i->checkColor(image, x + dx * i, y + dy * i, r, g, b)).findFirst().orElse(-1);

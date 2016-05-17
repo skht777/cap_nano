@@ -23,6 +23,7 @@ public class MainWindow extends JFrame implements Capturable{
 	private JComboBox<SaveType> comboBox2;
 	private JComboBox<SortType> joinSortCombo; 
 	private JComboBox<SizeType> joinSizeCombo;
+	private JButton button2;
 	private JoinWindow visible;
 	private JTextArea textArea;
 	private Timer timer;
@@ -41,12 +42,12 @@ public class MainWindow extends JFrame implements Capturable{
 		comboBox1 = new JComboBox<>(ModeType.values());
 		comboBox1.addActionListener(event->changeMode());
 		
-		JButton button2 = new JButton("画像追加");
+		button2 = new JButton("画像追加");
 		button2.addActionListener(event->Optional.ofNullable(visible).ifPresent(v->v.addImage(Capture.getImage())));
 		button2.setMnemonic(KeyEvent.VK_Z);
 		
 		JButton button3 = new JButton("画像保存");
-		button3.addActionListener(event->(visible == null ? this : visible).savePicture());
+		button3.addActionListener(event->Optional.ofNullable((Capturable) visible).orElse(this).savePicture());
 		
 		comboBox2 = new JComboBox<>(SaveType.values());
 		comboBox2.setActionCommand("保存種別");
@@ -64,7 +65,6 @@ public class MainWindow extends JFrame implements Capturable{
 				timer.setDelay(fps.getDelay());
 			}
 		}).setVisible(true));
-		button2.setEnabled(false);
 		textArea = new JTextArea();
 		textArea.setRows(4);
 		textArea.setEditable(false);
@@ -96,9 +96,12 @@ public class MainWindow extends JFrame implements Capturable{
 	}
 	private <T> T getItem(JComboBox<T> comboBox){return comboBox.getItemAt(comboBox.getSelectedIndex());}
 	private void reset(){
-		Optional.ofNullable(visible).ifPresent(window->window.setVisible(false));
-		visible = null;
+		button2.setEnabled(false);
 		comboBox2.setEnabled(true);
+		Optional.ofNullable(visible).ifPresent(window->{
+			window.setVisible(false);
+			visible = null;
+		});
 		Stream.of(joinSortCombo, joinSizeCombo).forEach(comboBox->{
 			comboBox.setModel(new DefaultComboBoxModel<>());
 			comboBox.setEnabled(false);
@@ -109,6 +112,8 @@ public class MainWindow extends JFrame implements Capturable{
 	private void changeMode(){
 		reset();
 		if(ModeType.MAIN.equals(getItem(comboBox1))) return;
+		button2.setEnabled(true);
+		comboBox2.setEnabled(false);
 		timer.setDelay(FPS.TWO.getDelay());
 		joinSortCombo.setEnabled(true);
 		joinSizeCombo.setEnabled(true);

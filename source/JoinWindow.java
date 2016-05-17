@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -60,16 +61,20 @@ public class JoinWindow extends JFrame implements Capturable{
 	/* アクセッサ */
 	public int getIndex(int i){return sort.getMethod(option).applyAsInt(i);}
 	public void setSortType(SortType type){
-		if(sort != null && sort.equals(type)) return;
+		if(Objects.equals(sort, type)) return;
+		// 一度入れ替えたものをもう一度入れ替えることで元の場所に戻す
+		IntStream.range(0, getContentPane().getComponentCount()).filter(i->i < getIndex(i)).forEach(i->
+		ImageLabel.swapImage((ImageLabel) getContentPane().getComponent(i), (ImageLabel) getContentPane().getComponent(getIndex(i))));
 		sort = type;
-		IntStream.range(0, getContentPane().getComponentCount()).forEach(i->
+		// 新しい配置方法を適応する
+		IntStream.range(0, getContentPane().getComponentCount()).filter(i->i < getIndex(i)).forEach(i->
 		ImageLabel.swapImage((ImageLabel) getContentPane().getComponent(i), (ImageLabel) getContentPane().getComponent(getIndex(i))));
 		redraw();
 	}
 	public void setSizeType(SizeType type){
 		if(size != null && size.equals(type)) return;
 		size = type;
-		setPreferredSize(new Dimension(option.packZoom(size.getWidth()) * option.getRow(), option.packZoom(size.getHeight() * option.getColumn())));
+		setPreferredSize(new Dimension(option.packZoom(size.getWidth()) * option.getColumn(), option.packZoom(size.getHeight() * option.getRow())));
 		redraw();
 	}
 	/* 表示を更新する */
@@ -107,9 +112,10 @@ public class JoinWindow extends JFrame implements Capturable{
 	/* 画像を追加する */
 	public void addImage(BufferedImage image){
 		if(image == null || !option.checkImage(image)) return;
-		Arrays.stream(getContentPane().getComponents()).map(c->(ImageLabel) c).filter(il->!il.hasImage()).findFirst().ifPresent(il->{
-			LogManager.getLogger().appendLog("【画像追加】");
+		IntStream.range(0, getContentPane().getComponentCount()).map(this::getIndex)
+		.mapToObj(p->(ImageLabel) getContentPane().getComponent(p)).filter(il->!il.hasImage()).findFirst().ifPresent(il->{
 			il.setImage(image.getSubimage(option.getPositionX(), option.getPositionY(), size.getWidth(), size.getHeight()));
+			LogManager.getLogger().appendLog("【画像追加】");
 			LogManager.getLogger().appendLog("位置：" + il.toString());		
 		});
 	}
@@ -130,37 +136,36 @@ public class JoinWindow extends JFrame implements Capturable{
 	}
 	/* 画像を保存する */
 	private boolean exclude(int arg, int ...excludes){return !IntStream.of(excludes).anyMatch(exclude->exclude == arg);}
-	private void drawFrame(Graphics2D graphics, double x1, double y1, double x2, double y2){
-		graphics.draw(new Line2D.Double(x1 * size.getWidth(), y1 * size.getHeight(), x2 * size.getWidth(), y2 * size.getHeight()));
+	private void drawFrame(Graphics2D graphics, int x1, int y1, int x2, int y2){
+		graphics.draw(new Line2D.Double(size.getWidth(x1), size.getHeight(y1), size.getWidth(x2), size.getHeight(y2)));
 	}
 	private void addSpecialFrame(Graphics2D graphics, int px1, int py1, int px2, int py2){
 		graphics.setStroke(new BasicStroke(option.getStroke()));
 		graphics.setPaint(Color.BLUE);
+		// 終端を除く各行・列に線を引く
 		switch(sort){
 			case ROW:
-				IntStream.range(1, option.getColumn()).filter(y->exclude(y, py1, py2 + 1)).forEach(y->IntStream.range(0, option.getRow())
-						.forEach(x->drawFrame(graphics, x, y, x + 1, y)));
+				IntStream.range(py1 + 1, py2 + 1).forEach(y->drawFrame(graphics, px1, y, px2 + 1, y));
 				break;
 			case COLUMN:
-				IntStream.range(1, option.getRow()).filter(x->exclude(x, py1, py2 + 1)).forEach(x->IntStream.range(0, option.getRow())
-						.forEach(y->drawFrame(graphics, x, y, x, y + 1)));
+				IntStream.range(px1 + 1, px2 + 1).forEach(x->drawFrame(graphics, x, py1, x, py2 + 1));
 				break;
 			case TEAM:
-				IntStream.range(0, option.getRow()).filter(x->exclude(3, py1, py2 + 1)).forEach(x->drawFrame(graphics, x, 3, x + 1, 3));
-				IntStream.range(0, option.getColumn()).filter(x->exclude(2, py1, py2 + 1)).forEach(x->drawFrame(graphics, 2, 0, 2, option.getColumn()));
-				IntStream.range(0, option.getColumn()).filter(x->exclude(2, py1, py2 + 1)).forEach(x->drawFrame(graphics, 4, 0, 4, option.getColumn()));
+				IntStream.of(3).filter(y->exclude(y, py1, py2 + 1)).forEach(y->drawFrame(graphics, px1, y, px2 + 1, y));
+				IntStream.of(2, 4).filter(x->exclude(x, px1, px2 + 1)).forEach(x->drawFrame(graphics, x, py1, x, py2 + 1));
 				break;
 		}
+		// 艦隊番号を付与する
 		if(option.equals(FrameOption.UNIT)){
 			graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			graphics.setFont(new Font("Arial", Font.PLAIN, 40));
-			IntStream.range(0, option.getColumn()).forEach(y->IntStream.range(0, option.getRow()).forEach(x->{
-				int px = getIndex(y * option.getColumn() + x) % option.getRow(), py = getIndex(y * option.getColumn() + x) / option.getRow();
+			IntStream.range(0, getContentPane().getComponentCount()).forEach(i->{
+				ImageLabel l1 = (ImageLabel) getContentPane().getComponent(i), l2 = (ImageLabel) getContentPane().getComponent(getIndex(i));
 				graphics.setPaint(Color.WHITE);
-				graphics.drawString(String.format("%d-%d", y + 1, x + 1), (px + 1) * size.getWidth() - 70, py * size.getHeight() + 40);
+				graphics.drawString(String.format("%d-%d", l1.getPY() + 1, l1.getPX() + 1), size.getWidth(l2.getPX() + 1) - 70,  size.getHeight(l2.getPY()) + 40);
 				graphics.setPaint(Color.RED);
-				graphics.drawString(String.format("%d-%d", y + 1, x + 1), (px + 1) * size.getWidth() - 72, py * size.getHeight() + 38);
-			}));
+				graphics.drawString(String.format("%d-%d", l1.getPY() + 1, l1.getPX() + 1), size.getWidth(l2.getPX() + 1) - 72,  size.getHeight(l2.getPY()) + 38);
+			});
 		}
 	}
 	@Override
@@ -168,21 +173,21 @@ public class JoinWindow extends JFrame implements Capturable{
 		// 最大領域を判断する(左隅のラベルと右隅のラベルを取得する)
 		List<ImageLabel> list = Arrays.stream(getContentPane().getComponents())
 				.map(c->(ImageLabel) c).filter(ImageLabel::hasImage).collect(Collectors.toList());
+		if(list.isEmpty()) return;
 		ImageLabel min = (ImageLabel) getContentPane().getComponentAt(list.stream().mapToInt(ImageLabel::getX).min().getAsInt(), 
 				list.stream().mapToInt(ImageLabel::getY).min().getAsInt());
 		ImageLabel max = (ImageLabel) getContentPane().getComponentAt(list.stream().mapToInt(ImageLabel::getX).max().getAsInt(), 
 				list.stream().mapToInt(ImageLabel::getY).max().getAsInt());
-		if(min.equals(max)) return;
 		// 保存用バッファに画像を配置する
-		BufferedImage saveBuffer = new BufferedImage(option.unPackZoom(getWidth()), option.unPackZoom(getHeight()), BufferedImage.TYPE_INT_BGR);
+		BufferedImage saveBuffer = new BufferedImage(size.getWidth(option.getColumn()), size.getHeight(option.getRow()), BufferedImage.TYPE_INT_BGR);
 		Graphics2D graphics = saveBuffer.createGraphics();
-		list.forEach(il->graphics.drawImage(il.getImage(), option.unPackZoom(il.getX()), option.unPackZoom(il.getY()), this));
+		list.forEach(il->graphics.drawImage(il.getImage(), size.getWidth(il.getPX()), size.getHeight(il.getPY()), this));
 		// 特殊な枠線を追加する
 		if(OptionData.getData().drawFrame())
-			addSpecialFrame(graphics, min.getIndexX(), min.getIndexY(), max.getIndexX(), max.getIndexY());
+			addSpecialFrame(graphics, min.getPX(), min.getPY(), max.getPX(), max.getPY());
 		graphics.dispose();
-		Capturable.savePicture(saveBuffer.getSubimage(option.unPackZoom(min.getX()), option.unPackZoom(min.getY()),
-				 option.unPackZoom((max.getX() - min.getX())), option.unPackZoom((max.getY() - min.getY()))));
+		Capturable.savePicture(saveBuffer.getSubimage(size.getWidth(min.getPX()), size.getHeight(min.getPX()),
+				 size.getWidth(max.getPX() - min.getPX() + 1), size.getHeight(max.getPY() - min.getPY() + 1)));
 		int option = JOptionPane.showConfirmDialog(this, "画像をクリアしますか？", "記録は大切なの", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 		if(option == JOptionPane.YES_OPTION)
 			Arrays.stream(getContentPane().getComponents()).map(c->(ImageLabel) c).forEach(ImageLabel::clearImage);

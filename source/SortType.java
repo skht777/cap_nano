@@ -4,8 +4,8 @@ import java.util.function.ToIntBiFunction;
 public enum SortType{
 	ROW("行を優先", (i,o)->i),
 	COLUMN("列を優先", (i, o)->{
-		int x = i / o.getRow(), y = i % o.getColumn();
-		return y * o.getRow() + x;
+		int x = i / o.getColumn(), y = i % o.getRow();
+		return y * o.getColumn() + x;
 			}),
 	TEAM("艦隊優先", (i, o)->new int[]{
 			1,  2,  7,  8,  13, 14,

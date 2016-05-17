@@ -10,6 +10,7 @@ public class OptionData{
 	public static OptionData getData(){return data;}
 	private OptionData(){
 		fps = FPS.DISABLE;
+		drawFrame = true;
 		disableName = true;
 	}
 	public FPS getFPS(){return fps;}

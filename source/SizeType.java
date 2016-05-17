@@ -15,6 +15,8 @@ public enum SizeType {
 	}
 	public int getWidth(){return width;}
 	public int getHeight(){return height;}
+	public int getWidth(int x){return getWidth() * x;}
+	public int getHeight(int y){return getHeight() * y;}
 	@Override
 	public String toString(){return name;}
 }

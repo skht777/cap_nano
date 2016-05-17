@@ -43,8 +43,9 @@ public class OptionWindow extends JFrame{
 		getContentPane().add(checkbox2);
 		getContentPane().add(checkbox3);
 		getContentPane().add(comboBox);
-		checkbox1.setSelected(true);
-		checkbox3.setSelected(true);
+		checkbox1.setSelected(OptionData.getData().drawFrame());
+		checkbox2.setSelected(OptionData.getData().isAuto());
+		checkbox3.setSelected(OptionData.getData().disableName());
 		pack();
 	}
 }
