@@ -1,18 +1,16 @@
 package nano.frame;
-import java.awt.Color;
+
+import nano.LogManager;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Optional;
-
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
-
-import nano.LogManager;
 
 @SuppressWarnings("serial")
 class ImageLabel extends JLabel{
@@ -23,7 +21,10 @@ class ImageLabel extends JLabel{
 		RED(new LineBorder(Color.RED, 4)),
 		BLUE(new LineBorder(Color.BLUE, 4));
 		private Border border;
-		private LINE(Border border){this.border = border;}
+
+		LINE(Border border) {
+			this.border = border;
+		}
 		private void set(JComponent ...cs){Arrays.stream(cs).forEach(c->c.setBorder(border));}
 	}
 	public ImageLabel(){
@@ -39,7 +40,7 @@ class ImageLabel extends JLabel{
 	}
 	private static void changeColor(MouseEvent event, ImageLabel.LINE line){
 		Optional.of(event).filter(e->e.getButton() > 0).map(e->(JComponent) e.getSource())
-		.filter(c->!LINE.RED.border.equals(c.getBorder())).ifPresent(c->line.set(c));
+				.filter(c -> !LINE.RED.border.equals(c.getBorder())).ifPresent(line::set);
 	}
 	public int getPX(){return getX() / getWidth();}
 	public int getPY(){return getY() / getHeight();}
